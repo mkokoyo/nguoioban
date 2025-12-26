@@ -3,120 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Studio - Secure & Cloud</title>
+    <title>Gemini Studio - Full Features</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #0a0a0a; --card: #161616; --primary: #ff4757; --text: #f5f5f5; --accent: #00d2ff; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #222; position: sticky; top:0; z-index:100; }
+        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; --accent: #00d2ff; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+        
+        nav { padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #222; position: sticky; top:0; z-index:100; }
         .logo { font-weight: 900; font-size: 24px; color: var(--primary); }
+
         .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-        .hero { display: grid; grid-template-columns: 1.8fr 1fr; gap: 30px; }
-        .player-wrapper { background: var(--card); border-radius: 20px; overflow: hidden; }
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
+        
+        /* Bộ lọc danh mục */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .tab { padding: 8px 18px; background: #222; border-radius: 20px; cursor: pointer; font-size: 14px; white-space: nowrap; border: 1px solid transparent; }
+        .tab.active { background: var(--primary); border-color: var(--primary); }
+
+        /* Cinema Layout */
+        .hero { display: grid; grid-template-columns: 1.8fr 1fr; gap: 25px; }
+        .player-main { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #222; }
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
-        
-        /* Form UI */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: #1a1a1a; padding: 30px; border-radius: 20px; width: 350px; border: 1px solid #333; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; color: white; border: 1px solid #333; border-radius: 10px; box-sizing: border-box; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        
-        .sidebar { background: var(--card); padding: 20px; border-radius: 20px; max-height: 600px; overflow-y: auto; }
-        .video-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; padding: 10px; border-radius: 10px; transition: 0.3s; position: relative; }
+
+        /* Sidebar Danh sách phát */
+        .sidebar { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid #222; max-height: 800px; overflow-y: auto; }
+        .video-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; padding: 8px; border-radius: 10px; transition: 0.3s; position: relative; }
         .video-item:hover { background: #222; }
-        .video-item img { width: 120px; border-radius: 8px; }
-        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 10px; display: none; }
+        .video-item img { width: 140px; border-radius: 8px; aspect-ratio: 16/9; object-fit: cover; }
+        .video-info h4 { margin: 0; font-size: 14px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .cat-tag { font-size: 10px; color: var(--accent); text-transform: uppercase; margin-top: 5px; display: block; }
+
+        /* Form & Modals */
+        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #000; color: white; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; }
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:1000; }
+        .modal-content { background:#1a1a1a; padding:30px; border-radius:15px; width:350px; }
+
+        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: none; }
         .video-item:hover .del-btn { display: block; }
+
+        @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div id="app">
     <nav>
-        <div class="logo">GEMINI<span style="color:white">PRO</span></div>
-        <div class="nav-user">
-            <button v-if="!currentUser" class="btn-main" @click="authMode = 'login'">Đăng nhập</button>
-            <div v-else>
-                <span>Chào, <b>{{ currentUser.username }}</b></span>
-                <button @click="logout" style="margin-left:10px; color:gray; background:none; border:none; cursor:pointer;">Thoát</button>
-                <button v-if="currentUser.role === 'admin'" class="btn-main" style="width:auto; margin-left:10px" @click="adminPanel = !adminPanel">Admin</button>
+        <div class="logo">GEMINI STUDIO</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <div v-if="currentUser" style="font-size:14px;">
+                Chào, <b :style="{color: currentUser.role==='admin'?'red':''} ">{{ currentUser.username }}</b>
+                <button @click="logout" style="background:none; border:none; color:gray; cursor:pointer; margin-left:10px;">Thoát</button>
             </div>
+            <button v-if="!currentUser" class="btn-p" @click="authMode = 'login'">Đăng nhập</button>
+            <button v-if="currentUser?.role === 'admin'" class="btn-p" @click="adminMode = !adminMode">🔧 Quản lý</button>
         </div>
     </nav>
 
     <div v-if="authMode" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-top:0">{{ authTitle }}</h2>
-            
+            <h3 style="margin-top:0">{{ authMode==='login'?'Đăng nhập':(authMode==='reg'?'Đăng ký':'Quên mật khẩu') }}</h3>
             <div v-if="authMode !== 'forgot'">
                 <input v-model="authForm.user" placeholder="Tên đăng nhập">
-                <input v-if="authMode === 'reg'" v-model="authForm.email" placeholder="Email đăng ký">
+                <input v-if="authMode === 'reg'" v-model="authForm.email" placeholder="Email (để lấy lại pass)">
                 <input type="password" v-model="authForm.pass" placeholder="Mật khẩu">
-                <button class="btn-main" @click="handleAuth">{{ authButton }}</button>
+                <button class="btn-p" style="width:100%" @click="handleAuth">Thực hiện</button>
             </div>
-
             <div v-else>
-                <p style="font-size:13px; color:gray">Nhập Email bạn đã dùng để đăng ký:</p>
-                <input v-model="authForm.email" placeholder="Email của bạn">
-                <button class="btn-main" @click="recoverPass">Tìm lại mật khẩu</button>
+                <input v-model="authForm.email" placeholder="Nhập Email đã đăng ký">
+                <button class="btn-p" style="width:100%" @click="recoverPass">Lấy lại mật khẩu</button>
             </div>
-
-            <div style="margin-top:20px; text-align:center; font-size:13px; color:gray">
-                <span v-if="authMode === 'login'" @click="authMode = 'reg'" style="cursor:pointer; color:var(--accent)">Chưa có tài khoản? Đăng ký</span><br><br>
-                <span v-if="authMode === 'login'" @click="authMode = 'forgot'" style="cursor:pointer;">Quên mật khẩu?</span>
-                <span v-else @click="authMode = 'login'" style="cursor:pointer; color:var(--accent)">Quay lại Đăng nhập</span>
-            </div>
-            <button @click="authMode = null" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Đóng</button>
+            <p style="font-size:12px; color:gray; text-align:center; cursor:pointer; margin-top:15px;" @click="authMode = (authMode==='login'?'reg':'login')">
+                {{ authMode==='login'?'Chưa có tài khoản? Đăng ký':'Đã có tài khoản? Đăng nhập' }}
+            </p>
+            <p v-if="authMode==='login'" style="font-size:12px; color:gray; text-align:center; cursor:pointer;" @click="authMode = 'forgot'">Quên mật khẩu?</p>
+            <button @click="authMode = null" style="width:100%; background:none; border:none; color:gray; margin-top:10px;">Đóng</button>
         </div>
     </div>
 
     <div class="container">
-        <div v-if="adminPanel" style="background:#1a1a1a; padding:25px; border-radius:20px; border:1px solid var(--primary); margin-bottom:30px;">
-            <input v-model="ytId" placeholder="Dán ID YouTube để đăng bài...">
-            <button class="btn-main" @click="addVideo">Đăng Video Lên Cloud</button>
+        <div v-if="adminMode && currentUser?.role==='admin'" style="background:#1a1a1a; padding:20px; border-radius:15px; border:1px solid var(--primary); margin-bottom:25px;">
+            <h3>🚀 Đăng Video mới</h3>
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px">
+                <input v-model="ytId" placeholder="Dán ID YouTube...">
+                <select v-model="ytCat">
+                    <option value="All">Phân loại: Chung</option>
+                    <option value="Shorts">Video Ngắn</option>
+                    <option value="Vlog">Cuộc sống / Vlog</option>
+                    <option value="Music">Âm nhạc</option>
+                    <option value="Tutorial">Hướng dẫn</option>
+                </select>
+                <button class="btn-p" @click="addVideo">Đăng bài</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab" :class="{active: activeTab === 'All'}" @click="activeTab = 'All'">Tất cả</div>
+            <div class="tab" :class="{active: activeTab === 'Shorts'}" @click="activeTab = 'Shorts'">Video Ngắn</div>
+            <div class="tab" :class="{active: activeTab === 'Vlog'}" @click="activeTab = 'Vlog'">Cuộc sống</div>
+            <div class="tab" :class="{active: activeTab === 'Music'}" @click="activeTab = 'Music'">Âm nhạc</div>
+            <div class="tab" :class="{active: activeTab === 'Tutorial'}" @click="activeTab = 'Tutorial'">Hướng dẫn</div>
         </div>
 
         <div class="hero">
-            <div class="main-player">
-                <div class="player-wrapper">
+            <div class="main-view">
+                <div class="player-main">
                     <div class="video-box">
                         <iframe :src="'https://www.youtube.com/embed/' + current.id" allowfullscreen></iframe>
                     </div>
-                </div>
-                <div style="padding:20px">
-                    <h1>{{ current.title }}</h1>
-                    <div style="background:#111; padding:20px; border-radius:15px;">
-                        <h3>Bình luận</h3>
-                        <div v-if="currentUser">
-                            <textarea v-model="newCmt" style="width:100%; height:60px; background:#000; color:white; border-radius:10px; padding:10px;" placeholder="Nhập cảm nghĩ..."></textarea>
-                            <button class="btn-main" style="width:auto" @click="sendComment">Gửi</button>
-                        </div>
-                        <div v-for="c in comments" style="margin-top:15px; border-bottom:1px solid #222; padding-bottom:10px">
-                            <b style="color:var(--primary)">{{ c.name }}</b>: {{ c.text }}
+                    <div style="padding:20px">
+                        <h2 style="margin:0">{{ current.title }}</h2>
+                        <div style="margin-top:20px; background:#111; padding:20px; border-radius:12px">
+                            <h3>Bình luận</h3>
+                            <div v-if="currentUser">
+                                <textarea v-model="cmtInput" placeholder="Viết cảm nghĩ..."></textarea>
+                                <button class="btn-p" @click="sendCmt">Gửi</button>
+                            </div>
+                            <div v-for="c in comments" style="padding:10px 0; border-bottom:1px solid #222">
+                                <b :style="{color: c.name==='Admin'?'red':'var(--accent)'}">{{ c.name }}</b>: {{ c.text }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar">
-                <h3>Danh sách phát</h3>
-                <div v-for="v in videos" :key="v.key" class="video-item" @click="current = v">
+                <h3 style="margin-top:0">Danh sách phát</h3>
+                <div v-for="v in filteredVideos" :key="v.key" class="video-item" @click="current = v">
                     <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <div>
-                        <h4 style="margin:0; font-size:14px">{{ v.title }}</h4>
+                    <div class="video-info">
+                        <h4>{{ v.title }}</h4>
+                        <span class="cat-tag">{{ v.category || 'Chung' }}</span>
                     </div>
-                    <button v-if="currentUser && currentUser.role === 'admin'" class="del-btn" @click.stop="deleteVideo(v.key)">✕</button>
+                    <button v-if="currentUser?.role==='admin'" class="del-btn" @click.stop="deleteVideo(v.key)">✕</button>
                 </div>
+                <div v-if="filteredVideos.length === 0" style="color:gray; text-align:center; padding:20px">Trống</div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// --- CẤU HÌNH ---
 const YT_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM";
 const fbConfig = {
     apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
@@ -133,23 +162,25 @@ const { createApp, ref, onMounted, computed, watch } = Vue;
 
 createApp({
     setup() {
-        const authMode = ref(null); 
         const currentUser = ref(JSON.parse(localStorage.getItem('user_session')));
-        const authForm = ref({ user: '', pass: '', email: '' });
-        const adminPanel = ref(false);
+        const authMode = ref(null);
+        const adminMode = ref(false);
+        const authForm = ref({ user:'', pass:'', email:'' });
         const videos = ref([]);
-        const current = ref({id: 'dQw4w9WgXcQ', title: 'Chọn video để xem'});
-        const comments = ref([]);
+        const current = ref({id: 'dQw4w9WgXcQ', title: 'Chọn video'});
+        const activeTab = ref('All');
         const ytId = ref("");
-        const newCmt = ref("");
-
-        const authTitle = computed(() => ({ login: 'Đăng nhập', reg: 'Đăng ký thành viên', forgot: 'Quên mật khẩu' }[authMode.value]));
-        const authButton = computed(() => authMode.value === 'login' ? 'Vào hệ thống' : 'Tạo tài khoản');
+        const ytCat = ref("All");
+        const cmtInput = ref("");
+        const comments = ref([]);
 
         onMounted(() => {
             db.ref('videos').on('value', s => {
                 const data = s.val();
-                if(data) videos.value = Object.keys(data).map(k => ({key: k, ...data[k]})).reverse();
+                if(data) {
+                    videos.value = Object.keys(data).map(k => ({key: k, ...data[k]})).reverse();
+                    if(current.value.id === 'dQw4w9WgXcQ' && videos.value.length > 0) current.value = videos.value[0];
+                }
             });
         });
 
@@ -160,73 +191,65 @@ createApp({
             });
         }, { immediate: true });
 
-        // XỬ LÝ ĐĂNG NHẬP / ĐĂNG KÝ
+        const filteredVideos = computed(() => {
+            if(activeTab.value === 'All') return videos.value;
+            return videos.value.filter(v => v.category === activeTab.value);
+        });
+
         const handleAuth = () => {
             const { user, pass, email } = authForm.value;
-            if(!user || !pass) return alert("Vui lòng điền đủ!");
-
-            // Kiểm tra Admin cứng
-            if(authMode.value === 'login' && user === 'Admin' && pass === 'cong1997') {
-                currentUser.value = { username: 'Admin', role: 'admin' };
-                saveUser(); return;
-            }
-
-            if(authMode.value === 'reg') {
-                if(!email) return alert("Cần Email để hỗ trợ quên mật khẩu!");
-                db.ref('users/' + user).set({ pass, email, role: 'user' });
-                alert("Đăng ký thành công!"); authMode.value = 'login';
-            } else {
+            if(!user || !pass) return alert("Nhập đủ thông tin!");
+            
+            if(authMode.value === 'login') {
+                if(user === 'Admin' && pass === 'cong1997') {
+                    currentUser.value = { username:'Admin', role:'admin' };
+                    return saveSession();
+                }
                 db.ref('users/' + user).once('value', s => {
-                    const data = s.val();
-                    if(data && data.pass === pass) {
-                        currentUser.value = { username: user, role: data.role };
-                        saveUser();
-                    } else alert("Sai thông tin!");
+                    const d = s.val();
+                    if(d && d.pass === pass) { currentUser.value = { username:user, role:'user' }; saveSession(); }
+                    else alert("Sai thông tin!");
                 });
+            } else {
+                if(user.toLowerCase()==='admin') return alert("Không thể dùng tên này!");
+                db.ref('users/' + user).set({ pass, email, role:'user' });
+                alert("Xong! Hãy đăng nhập."); authMode.value = 'login';
             }
         };
 
         const recoverPass = () => {
-            if(!authForm.value.email) return alert("Nhập Email!");
             db.ref('users').once('value', s => {
-                const all = s.val();
-                let found = false;
-                for(let u in all) {
-                    if(all[u].email === authForm.value.email) {
-                        alert(`Mật khẩu của tài khoản [${u}] là: ${all[u].pass}`);
-                        found = true; break;
-                    }
+                const us = s.val();
+                for(let u in us) {
+                    if(us[u].email === authForm.value.email) return alert(`Tài khoản: ${u}\nMật khẩu: ${us[u].pass}`);
                 }
-                if(!found) alert("Không tìm thấy Email này!");
+                alert("Không tìm thấy!");
             });
         };
 
-        const saveUser = () => {
+        const saveSession = () => {
             localStorage.setItem('user_session', JSON.stringify(currentUser.value));
             authMode.value = null;
         };
 
-        const logout = () => { currentUser.value = null; localStorage.removeItem('user_session'); adminPanel.value = false; };
+        const logout = () => { currentUser.value = null; localStorage.removeItem('user_session'); adminMode.value = false; };
 
-        // VIDEO & COMMENT
         const addVideo = async () => {
             const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${ytId.value}&key=${YT_KEY}`);
             const j = await r.json();
             if(j.items) {
-                db.ref('videos').push({ id: ytId.value, title: j.items[0].snippet.title });
+                db.ref('videos').push({ id: ytId.value, title: j.items[0].snippet.title, category: ytCat.value });
                 ytId.value = "";
             }
         };
 
-        const deleteVideo = (k) => { if(confirm("Xóa?")) db.ref('videos/' + k).remove(); };
-
-        const sendComment = () => {
-            if(!newCmt.value) return;
-            db.ref('comments/' + current.value.id).push({ name: currentUser.value.username, text: newCmt.value });
-            newCmt.value = "";
+        const deleteVideo = (k) => { if(confirm("Xóa video?")) db.ref('videos/' + k).remove(); };
+        const sendCmt = () => {
+            db.ref('comments/' + current.value.id).push({ name: currentUser.value.username, text: cmtInput.value });
+            cmtInput.value = "";
         };
 
-        return { authMode, currentUser, authForm, adminPanel, videos, current, comments, ytId, newCmt, authTitle, authButton, handleAuth, recoverPass, logout, addVideo, deleteVideo, sendComment };
+        return { currentUser, authMode, adminMode, authForm, videos, current, activeTab, ytId, ytCat, cmtInput, comments, filteredVideos, handleAuth, recoverPass, logout, addVideo, deleteVideo, sendCmt };
     }
 }).mount('#app');
 </script>
