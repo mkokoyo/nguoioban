@@ -3,77 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Video Hub</title>
+    <title>Video Hub Premium</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         :root {
-            --primary: #ff0000;
-            --bg: #0f0f0f;
-            --card: #1a1a1a;
-            --text: #ffffff;
-            --accent: #3ea6ff;
+            --bg: #0a0a0a; --card: #161616; --primary: #ff0000; --text: #fff;
         }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        
+        /* Navigation */
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .logo { font-weight: 800; font-size: 24px; color: var(--primary); }
+        .admin-btn { background: #333; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; }
 
-        body {
-            margin: 0; font-family: 'Roboto', Arial, sans-serif;
-            background-color: var(--bg); color: var(--text);
-        }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
 
-        /* Header phong cách hiện đại */
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000;
-            border-bottom: 1px solid #333;
-        }
+        /* Row 1: Feature Video & Sidebar */
+        .hero-section { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .main-player { background: var(--card); border-radius: 15px; overflow: hidden; }
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
+        
+        .sidebar-list { display: flex; flex-direction: column; gap: 15px; }
+        .side-item { display: flex; gap: 10px; cursor: pointer; border-radius: 8px; transition: 0.3s; padding: 5px; }
+        .side-item:hover { background: #222; }
+        .side-item img { width: 120px; border-radius: 8px; }
+        .side-item h4 { margin: 0; font-size: 14px; line-height: 1.2; }
 
-        .logo { font-size: 22px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .btn-admin { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; }
-        .btn-admin:hover { background: #444; }
+        /* Playlist Sections */
+        .playlist-row { margin-bottom: 40px; }
+        .playlist-title { font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); padding-left: 15px; }
+        .video-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .grid-item { cursor: pointer; transition: 0.3s; }
+        .grid-item:hover { transform: translateY(-5px); }
+        .grid-item img { width: 100%; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; }
+        .grid-item p { font-size: 13px; margin: 8px 0; font-weight: 500; }
 
-        /* Bố cục trang chủ */
-        .main-container {
-            display: grid; grid-template-columns: 1fr 350px;
-            gap: 24px; max-width: 1400px; margin: 20px auto; padding: 0 20px;
-        }
-
-        /* Trình phát video */
-        .video-player-section { background: var(--card); border-radius: 12px; overflow: hidden; }
-        .iframe-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-        .iframe-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
-        .video-details { padding: 20px; }
-        .video-details h1 { font-size: 20px; margin: 0 0 10px 0; line-height: 1.4; }
-        .video-details p { color: #aaa; font-size: 14px; }
-
-        /* Danh sách phát bên cạnh */
-        .sidebar { display: flex; flex-direction: column; gap: 15px; }
-        .playlist-card { 
-            display: flex; gap: 12px; cursor: pointer; 
-            padding: 8px; border-radius: 8px; transition: 0.2s;
-        }
-        .playlist-card:hover { background: #2a2a2a; }
-        .thumb { width: 140px; height: 80px; background: #333; border-radius: 8px; object-fit: cover; }
-        .item-info b { font-size: 14px; display: block; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .item-info span { font-size: 12px; color: #aaa; }
-
-        /* Bảng quản trị */
-        .admin-panel {
-            grid-column: 1 / -1; background: #252525; padding: 30px; 
-            border-radius: 15px; border: 1px solid var(--primary); margin-top: 20px;
-        }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
-        input { 
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; 
-            background: #111; color: white; box-sizing: border-box; margin-top: 5px;
-        }
-        .btn-save { 
-            background: var(--primary); color: white; border: none; 
-            padding: 12px 30px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; margin-top: 20px; 
-        }
+        /* Admin Panel */
+        .admin-panel { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid var(--primary); margin: 20px 0; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; }
 
         @media (max-width: 1000px) {
-            .main-container { grid-template-columns: 1fr; }
+            .hero-section { grid-template-columns: 1fr; }
+            .video-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -81,99 +53,90 @@
 
 <div id="app">
     <nav>
-        <div class="logo">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
-            PREMIUM VIDEO
-        </div>
-        <button class="btn-admin" @click="checkAdmin">{{ isAdmin ? 'Đăng xuất' : 'Quản trị' }}</button>
+        <div class="logo">GEMINI<span style="color:#fff">TV</span></div>
+        <button class="admin-btn" @click="toggleAdmin">{{ isAdmin ? 'Thoát Admin' : 'Quản trị' }}</button>
     </nav>
 
-    <div class="main-container">
-        <div class="video-player-section">
-            <div class="iframe-container">
-                <iframe :src="'https://www.youtube.com/embed/' + mainVideoId" allowfullscreen></iframe>
-            </div>
-            <div class="video-details">
-                <h1>{{ mainTitle }}</h1>
-                <p>1,245,678 lượt xem • Đang cập nhật nội dung mới nhất</p>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <h3 style="margin: 0 0 10px 0;">Video tiếp theo</h3>
-            <div class="playlist-card" v-for="i in 4" :key="i">
-                <img :src="'https://img.youtube.com/vi/' + mainVideoId + '/mqdefault.jpg'" class="thumb">
-                <div class="item-info">
-                    <b>Gợi ý: {{ mainTitle }} (Phần {{i + 1}})</b>
-                    <span>Kênh của bạn • 500K lượt xem</span>
-                </div>
-            </div>
-        </div>
-
+    <div class="container">
         <div v-if="isAdmin" class="admin-panel">
-            <h2 style="margin: 0; color: var(--primary);">⚙️ Cài đặt giao diện trang web</h2>
-            <div class="form-grid">
-                <div>
-                    <label>Tiêu đề Video chính:</label>
-                    <input v-model="editTitle" placeholder="Nhập tiêu đề hấp dẫn...">
+            <h3>⚙️ Quản lý nội dung</h3>
+            <label>ID Video chính (Bên trái):</label>
+            <input v-model="mainId">
+            <button @click="saveData" style="background:var(--primary); color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Lưu thay đổi</button>
+        </div>
+
+        <div class="hero-section">
+            <div class="main-player">
+                <div class="video-box">
+                    <iframe :src="'https://www.youtube.com/embed/' + mainId" allowfullscreen></iframe>
                 </div>
-                <div>
-                    <label>Mã ID Video YouTube:</label>
-                    <input v-model="editId" placeholder="Ví dụ: dQw4w9WgXcQ">
+                <div style="padding: 15px;">
+                    <h2 style="margin:0">Video Nổi Bật Hôm Nay</h2>
+                    <p style="color:#aaa; font-size:14px;">Tự động cập nhật từ hệ thống quản trị của bạn.</p>
                 </div>
             </div>
-            <button class="btn-save" @click="updateWeb">Lưu và Cập nhật trang chủ</button>
+
+            <div class="sidebar-list">
+                <h3 style="margin-top:0">Gợi ý cho bạn</h3>
+                <div v-for="i in 4" class="side-item" @click="changeMain(sideVideos[i-1])">
+                    <img :src="'https://img.youtube.com/vi/'+sideVideos[i-1]+'/mqdefault.jpg'">
+                    <h4>Video gợi ý đặc sắc số {{i}}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div v-for="(playlist, index) in playlists" :key="index" class="playlist-row">
+            <div class="playlist-title">{{ playlist.name }}</div>
+            <div class="video-grid">
+                <div v-for="vID in playlist.videos" class="grid-item" @click="changeMain(vID)">
+                    <img :src="'https://img.youtube.com/vi/'+vID+'/mqdefault.jpg'">
+                    <p>Khám phá nội dung mới nhất #{{vID.slice(0,3)}}</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted } = Vue;
 
-    createApp({
-        setup() {
-            const isAdmin = ref(false);
-            const mainTitle = ref("Kỳ quan thiên nhiên Việt Nam - Hành trình khám phá");
-            const mainVideoId = ref("dQw4w9WgXcQ");
-            
-            const editTitle = ref("");
-            const editId = ref("");
+createApp({
+    setup() {
+        const isAdmin = ref(false);
+        const mainId = ref("dQw4w9WgXcQ");
+        const sideVideos = ["jNQXAC9IVRw", "9bZkp7q19f0", "2Vv-BfVoq4g", "kJQP7kiw5Fk"];
 
-            onMounted(() => {
-                const savedTitle = localStorage.getItem('title');
-                const savedId = localStorage.getItem('videoId');
-                if(savedTitle) mainTitle.value = savedTitle;
-                if(savedId) mainVideoId.value = savedId;
-                
-                editTitle.value = mainTitle.value;
-                editId.value = mainVideoId.value;
-            });
+        // Dữ liệu 3 danh sách phát, mỗi danh sách 5 video
+        const playlists = ref([
+            { name: "🎬 Phim Ngắn Mới Xuất Bản", videos: ["ScMzIvxBSi4", "OPf0YbXqDm0", "L_jWHff96Tw", "3JZ_D3ELwOQ", "VbfpWjIqOHw"] },
+            { name: "🎵 Âm Nhạc Thịnh Hành", videos: ["9bZkp7q19f0", "hT_nvWreIhg", "JGwWNGJdvx8", "CevxZvSJLk8", "YQHsXMglC9A"] },
+            { name: "🌏 Khám Phá Thế Giới", videos: ["ScMzIvxBSi4", "OPf0YbXqDm0", "L_jWHff96Tw", "3JZ_D3ELwOQ", "VbfpWjIqOHw"] }
+        ]);
 
-            const checkAdmin = () => {
-                if(isAdmin.value) {
-                    isAdmin.value = false;
-                    return;
-                }
-                const pass = prompt("Nhập mật khẩu quản trị (Mặc định: 123456):");
-                if(pass === "123456") {
-                    isAdmin.value = true;
-                } else {
-                    alert("Sai mật khẩu!");
-                }
-            };
+        onMounted(() => {
+            const savedMain = localStorage.getItem('mainId');
+            if(savedMain) mainId.value = savedMain;
+        });
 
-            const updateWeb = () => {
-                mainTitle.value = editTitle.value;
-                mainVideoId.value = editId.value;
-                localStorage.setItem('title', editTitle.value);
-                localStorage.setItem('videoId', editId.value);
-                alert("Đã lưu thành công! Mọi người sẽ thấy thay đổi này.");
-            };
+        const toggleAdmin = () => {
+            if(!isAdmin.value) {
+                if(prompt("Mật khẩu:") === "123") isAdmin.value = true;
+            } else isAdmin.value = false;
+        };
 
-            return { isAdmin, mainTitle, mainVideoId, editTitle, editId, checkAdmin, updateWeb }
-        }
-    }).mount('#app')
+        const saveData = () => {
+            localStorage.setItem('mainId', mainId.value);
+            alert("Đã lưu!");
+        };
+
+        const changeMain = (id) => {
+            mainId.value = id;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        return { isAdmin, mainId, sideVideos, playlists, toggleAdmin, saveData, changeMain };
+    }
+}).mount('#app');
 </script>
-
 </body>
 </html>
