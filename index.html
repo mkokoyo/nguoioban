@@ -3,45 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Studio - Video & Community</title>
+    <title>Gemini Cloud Studio</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; --accent: #2ecc71; --gold: #f1c40f; }
+        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; --gold: #f1c40f; --accent: #2ecc71; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
         
         nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #222; position: sticky; top:0; z-index:100; }
         .logo { font-weight: 900; font-size: 24px; color: var(--primary); text-transform: uppercase; }
-        .nav-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-s { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
 
         .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-
-        /* Giao diện Đăng nhập/Đăng ký */
-        .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .auth-box { background: #1a1a1a; padding: 30px; border-radius: 12px; width: 350px; border: 1px solid #333; }
-        .auth-box input { width: 90%; padding: 12px; margin: 10px 0; background: #000; color: white; border: 1px solid #444; border-radius: 6px; }
-
-        /* Hero Layout */
-        .hero { display: grid; grid-template-columns: 1.6fr 1fr; gap: 25px; margin-bottom: 40px; }
+        .hero { display: grid; grid-template-columns: 1.6fr 1fr; gap: 25px; }
         .player-main { background: var(--card); border-radius: 12px; overflow: hidden; }
         .video-ratio { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-ratio iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
         
         /* Bình luận & Đánh giá */
         .comment-section { margin-top: 25px; background: #111; padding: 20px; border-radius: 12px; }
-        .star-rating { color: var(--gold); font-size: 20px; cursor: pointer; margin-bottom: 10px; }
-        .comment-input { width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; padding: 10px; box-sizing: border-box; }
-        .comment-list { margin-top: 20px; }
-        .comment-item { padding: 15px; border-bottom: 1px solid #222; }
-        .user-tag { font-weight: bold; color: var(--primary); font-size: 14px; }
+        .star { cursor: pointer; font-size: 22px; color: #333; transition: 0.2s; }
+        .star.active { color: var(--gold); }
+        .comment-input { width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; padding: 10px; margin: 10px 0; box-sizing: border-box; }
 
-        /* Admin & Sidebar */
-        .admin-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border: 1px solid var(--primary); margin-bottom: 30px; }
         .sidebar { background: var(--card); padding: 15px; border-radius: 12px; max-height: 600px; overflow-y: auto; }
-        .side-card { display: flex; gap: 12px; cursor: pointer; margin-bottom: 15px; }
-        .side-card img { width: 130px; border-radius: 6px; }
+        .side-card { display: flex; gap: 12px; cursor: pointer; margin-bottom: 15px; border-radius: 8px; transition: 0.2s; padding: 5px; }
+        .side-card:hover { background: #222; }
+        .side-card img { width: 140px; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; }
 
-        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-s { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .auth-box { background: #1a1a1a; padding: 30px; border-radius: 12px; width: 320px; text-align: center; border: 1px solid #333; }
+        
+        .admin-panel { background: #1a1a1a; padding: 20px; border: 1px solid var(--primary); border-radius: 12px; margin-bottom: 30px; }
+        input, select { padding: 12px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
 
         @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
     </style>
@@ -50,48 +46,35 @@
 
 <div id="app">
     <nav>
-        <div class="logo">GEMINI STUDIO</div>
+        <div class="logo">GEMINI TV</div>
         <div class="nav-actions">
-            <button v-if="!currentUser" class="btn-s" @click="showAuth = 'login'">Đăng nhập</button>
-            <div v-else style="display:flex; gap:15px; align-items:center;">
-                <span style="font-size:14px; color:var(--accent)">👋 Chào, {{ currentUser.name }}</span>
-                <button class="btn-s" style="padding:5px 10px; font-size:12px;" @click="logout">Thoát</button>
-                <button v-if="currentUser.role === 'admin'" class="btn-p" @click="showAdmin = !showAdmin">Admin</button>
+            <button v-if="!user" class="btn-p" @click="showAuth = true">Đăng nhập</button>
+            <div v-else>
+                <span style="color:var(--accent)">👤 {{ user.name }}</span>
+                <button @click="logout" style="margin-left:10px; background:none; color:gray; border:none; cursor:pointer;">Thoát</button>
+                <button v-if="user.role === 'admin'" @click="isAdminMode = !isAdminMode" class="btn-p" style="margin-left:10px">⚙️ Admin</button>
             </div>
         </div>
     </nav>
 
     <div v-if="showAuth" class="auth-modal">
         <div class="auth-box">
-            <h3>{{ showAuth === 'login' ? 'Đăng nhập' : 'Tạo tài khoản' }}</h3>
-            <input v-model="authForm.user" placeholder="Tên tài khoản">
-            <input type="password" v-model="authForm.pass" placeholder="Mật khẩu">
-            <button class="btn-p" style="width:100%" @click="handleAuth">{{ showAuth === 'login' ? 'Vào hệ thống' : 'Hoàn tất đăng ký' }}</button>
-            <p style="font-size:12px; color:gray; cursor:pointer; text-align:center" @click="showAuth = (showAuth === 'login' ? 'reg' : 'login')">
-                {{ showAuth === 'login' ? 'Chưa có tài khoản? Đăng ký ngay' : 'Đã có tài khoản? Đăng nhập' }}
-            </p>
-            <button class="btn-s" style="width:100%; margin-top:5px" @click="showAuth = null">Đóng</button>
+            <h3>Tham gia cộng đồng</h3>
+            <p style="font-size: 12px; color: gray;">(Dùng tên 'admin' để có quyền đăng bài)</p>
+            <input v-model="uInput" placeholder="Tên của bạn">
+            <button class="btn-p" style="width:100%" @click="login">Bắt đầu ngay</button>
+            <button @click="showAuth = false" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Hủy</button>
         </div>
     </div>
 
     <div class="container">
-        <div v-if="showAdmin" class="admin-box">
-            <h3>🚀 Đăng Video Siêu Tốc (Dành cho Admin)</h3>
+        <div v-if="isAdminMode" class="admin-panel">
+            <h3 style="margin-top:0">🚀 Đăng Video Mới (Tự động đồng bộ)</h3>
             <div style="display:flex; gap:10px">
-                <input v-model="tempId" placeholder="Dán ID Youtube (ví dụ: dQw4w9WgXcQ)" style="flex:1; padding:10px">
-                <button class="btn-p" @click="autoFetch">Lấy dữ liệu</button>
+                <input v-model="tempId" placeholder="Dán mã ID Youtube (ví dụ: dQw4w9WgXcQ)">
+                <button class="btn-p" style="height:45px" @click="postVideo">Xác nhận Đăng</button>
             </div>
-            <div v-if="preview" style="margin-top:15px; display:flex; gap:20px; align-items:center">
-                <img :src="preview.thumb" width="150">
-                <div>
-                    <p><b>{{ preview.title }}</b></p>
-                    <select v-model="selectedCat" style="padding:8px; background:#000; color:#fff">
-                        <option value="short">Video Ngắn</option>
-                        <option value="daily">Cuộc sống</option>
-                    </select>
-                    <button class="btn-p" style="margin-left:10px" @click="confirmPost">Đăng bài</button>
-                </div>
-            </div>
+            <p style="font-size:12px; color:gray">Hệ thống sẽ tự động lấy tiêu đề và mô tả từ YouTube API của bạn.</p>
         </div>
 
         <div class="hero">
@@ -100,28 +83,30 @@
                     <iframe :src="'https://www.youtube.com/embed/' + current.id" allowfullscreen></iframe>
                 </div>
                 <div style="padding:20px">
-                    <h2>{{ current.title }}</h2>
-                    <p style="color:#aaa; font-size:14px">{{ current.desc }}</p>
-
+                    <h2 style="margin:0">{{ current.title }}</h2>
+                    
                     <div class="comment-section">
                         <h3 style="margin-top:0">Đánh giá & Bình luận</h3>
-                        
-                        <div v-if="currentUser">
-                            <div class="star-rating">
-                                <span v-for="s in 5" @click="userRating = s" :style="{color: s <= userRating ? 'var(--gold)' : '#333'}">★</span>
+                        <div v-if="user">
+                            <div style="margin-bottom:10px">
+                                <span v-for="s in 5" class="star" :class="{active: s <= rating}" @click="rating = s">★</span>
+                                <span style="margin-left:10px; font-size:14px; color:var(--gold)">{{ rating }} / 5 sao</span>
                             </div>
-                            <textarea class="comment-input" v-model="userComment" placeholder="Chia sẻ cảm nghĩ của bạn..."></textarea>
-                            <button class="btn-p" style="margin-top:10px" @click="postComment">Gửi bình luận</button>
+                            <textarea class="comment-input" v-model="msg" placeholder="Chia sẻ cảm nhận của bạn về video này..."></textarea>
+                            <button class="btn-p" @click="sendComment">Gửi bình luận</button>
                         </div>
-                        <div v-else style="background:#222; padding:15px; border-radius:8px; text-align:center">
-                            Bạn cần <a href="#" @click="showAuth = 'login'" style="color:var(--primary)">đăng nhập</a> để bình luận và đánh giá.
+                        <div v-else style="background:#000; padding:20px; border-radius:8px; text-align:center">
+                            Vui lòng <a href="#" @click="showAuth = true" style="color:var(--primary)">đăng nhập</a> để tham gia thảo luận.
                         </div>
 
-                        <div class="comment-list">
-                            <div v-for="c in currentComments" class="comment-item">
-                                <div class="user-tag">{{ c.userName }} <span style="color:var(--gold); margin-left:10px">{{ '★'.repeat(c.rating) }}</span></div>
-                                <div style="font-size:14px; margin-top:5px; color:#ccc">{{ c.text }}</div>
-                                <div style="font-size:10px; color:#555; margin-top:5px">{{ c.time }}</div>
+                        <div style="margin-top:25px">
+                            <div v-for="c in comments" :key="c.time" style="padding:15px; border-bottom:1px solid #222; background:#161616; border-radius:8px; margin-bottom:10px">
+                                <div style="display:flex; justify-content:space-between">
+                                    <b style="color:var(--primary)">{{ c.name }}</b>
+                                    <span style="color:var(--gold)">{{ '★'.repeat(c.rating) }}</span>
+                                </div>
+                                <p style="margin:10px 0 0 0; font-size:14px; color:#ccc">{{ c.text }}</p>
+                                <small style="color:#444; font-size:10px">{{ new Date(c.time).toLocaleString() }}</small>
                             </div>
                         </div>
                     </div>
@@ -129,12 +114,12 @@
             </div>
 
             <div class="sidebar">
-                <h3 style="margin-top:0">Đang được quan tâm</h3>
-                <div v-for="v in allVideos" class="side-card" @click="play(v)">
-                    <img :src="v.thumb">
+                <h3 style="margin-top:0; border-bottom:1px solid #333; padding-bottom:10px">Video khác</h3>
+                <div v-for="v in videos" :key="v.id" class="side-card" @click="current = v">
+                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
                     <div>
                         <h4 style="margin:0; font-size:14px">{{ v.title }}</h4>
-                        <span style="font-size:11px; color:var(--primary)">{{ v.catName }}</span>
+                        <small style="color:gray">Dữ liệu từ Đám mây</small>
                     </div>
                 </div>
             </div>
@@ -143,103 +128,99 @@
 </div>
 
 <script>
-const { createApp, ref, onMounted, computed } = Vue;
-const API_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM"; 
+// --- CẤU HÌNH FIREBASE CỦA BẠN ---
+const firebaseConfig = {
+  apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
+  authDomain: "nguoioban-77943.firebaseapp.com",
+  projectId: "nguoioban-77943",
+  storageBucket: "nguoioban-77943.firebasestorage.app",
+  messagingSenderId: "96090638378",
+  appId: "1:96090638378:web:84c6d4c9ae26a87869db53",
+  measurementId: "G-9NQYEEXWBW",
+  databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/" // Đã cập nhật đúng chuẩn URL
+};
+
+// YouTube API Key đã cấu hình trước đó
+const YT_API_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM";
+
+// Khởi tạo Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const { createApp, ref, onMounted, watch } = Vue;
 
 createApp({
     setup() {
-        const showAuth = ref(null);
-        const currentUser = ref(null);
-        const showAdmin = ref(false);
-        const authForm = ref({ user: '', pass: '' });
-
+        const user = ref(JSON.parse(localStorage.getItem('gemini_user')));
+        const showAuth = ref(false);
+        const uInput = ref("");
+        const isAdminMode = ref(false);
+        const videos = ref([]);
+        const current = ref({id: 'dQw4w9WgXcQ', title: 'Đang tải video...'});
+        const msg = ref("");
+        const rating = ref(5);
+        const comments = ref([]);
         const tempId = ref("");
-        const preview = ref(null);
-        const selectedCat = ref("short");
-        const current = ref({ id: 'dQw4w9WgXcQ', title: 'Video Chào Mừng', desc: 'Đăng nhập để bình luận' });
 
-        const userRating = ref(5);
-        const userComment = ref("");
-        const allVideos = ref([]);
-        const allComments = ref([]);
-
+        // Tải Video từ Cloud
         onMounted(() => {
-            const vData = localStorage.getItem('gemini_video_store');
-            const cData = localStorage.getItem('gemini_comments');
-            const uData = localStorage.getItem('gemini_current_user');
-            if(vData) allVideos.value = JSON.parse(vData);
-            if(cData) allComments.value = JSON.parse(cData);
-            if(uData) currentUser.value = JSON.parse(uData);
-            if(allVideos.value.length > 0) current.value = allVideos.value[0];
+            db.ref('videos').on('value', snapshot => {
+                const data = snapshot.val();
+                videos.value = data ? Object.values(data).reverse() : [];
+                if(videos.value.length > 0 && current.value.id === 'dQw4w9WgXcQ') {
+                    current.value = videos.value[0];
+                }
+            });
         });
 
-        // HỆ THỐNG TÀI KHOẢN (Giả lập)
-        const handleAuth = () => {
-            if(!authForm.value.user || !authForm.value.pass) return alert("Vui lòng nhập đủ!");
-            
-            if(showAuth.value === 'reg') {
-                const users = JSON.parse(localStorage.getItem('gemini_users') || '[]');
-                users.push({ ...authForm.value, role: authForm.value.user === 'admin' ? 'admin' : 'user' });
-                localStorage.setItem('gemini_users', JSON.stringify(users));
-                alert("Đăng ký thành công!");
-                showAuth.value = 'login';
-            } else {
-                const users = JSON.parse(localStorage.getItem('gemini_users') || '[]');
-                const user = users.find(u => u.user === authForm.value.user && u.pass === authForm.value.pass);
-                if(user) {
-                    currentUser.value = { name: user.user, role: user.role };
-                    localStorage.setItem('gemini_current_user', JSON.stringify(currentUser.value));
-                    showAuth.value = null;
-                } else alert("Sai tài khoản!");
-            }
+        // Theo dõi Video hiện tại để tải bình luận tương ứng
+        watch(() => current.value.id, (newId) => {
+            db.ref('comments/' + newId).on('value', snapshot => {
+                const data = snapshot.val();
+                comments.value = data ? Object.values(data).reverse() : [];
+            });
+        }, { immediate: true });
+
+        const login = () => {
+            if(!uInput.value) return;
+            const role = uInput.value.toLowerCase() === 'admin' ? 'admin' : 'user';
+            user.value = { name: uInput.value, role };
+            localStorage.setItem('gemini_user', JSON.stringify(user.value));
+            showAuth.value = false;
         };
 
         const logout = () => {
-            currentUser.value = null;
-            localStorage.removeItem('gemini_current_user');
-            showAdmin.value = false;
+            user.value = null;
+            localStorage.removeItem('gemini_user');
+            isAdminMode.value = false;
         };
 
-        // BÌNH LUẬN
-        const postComment = () => {
-            if(!userComment.value) return;
-            const comment = {
-                videoId: current.value.id,
-                userName: currentUser.value.name,
-                rating: userRating.value,
-                text: userComment.value,
-                time: new Date().toLocaleString()
-            };
-            allComments.value.unshift(comment);
-            localStorage.setItem('gemini_comments', JSON.stringify(allComments.value));
-            userComment.value = "";
-        };
-
-        const currentComments = computed(() => {
-            return allComments.value.filter(c => c.videoId === current.value.id);
-        });
-
-        // ADMIN FUNCTIONS (Lấy từ bản trước)
-        const autoFetch = async () => {
+        const postVideo = async () => {
+            if(!tempId.value) return;
             try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${tempId.value}&key=${API_KEY}`);
-                const json = await res.json();
-                if(json.items.length > 0) {
-                    const snip = json.items[0].snippet;
-                    preview.value = { id: tempId.value, title: snip.title, desc: snip.description, thumb: snip.thumbnails.medium.url };
-                }
-            } catch (e) { alert("Lỗi API"); }
+                const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${tempId.value}&key=${YT_API_KEY}`);
+                const json = await response.json();
+                if(json.items && json.items.length > 0) {
+                    const title = json.items[0].snippet.title;
+                    db.ref('videos').push({ id: tempId.value, title, time: Date.now() });
+                    tempId.value = "";
+                    alert("Đăng bài thành công lên hệ thống!");
+                } else { alert("ID Video không tồn tại!"); }
+            } catch (e) { alert("Lỗi khi kết nối YouTube API!"); }
         };
 
-        const confirmPost = () => {
-            allVideos.value.unshift({ ...preview.value, cat: selectedCat.value, catName: selectedCat.value });
-            localStorage.setItem('gemini_video_store', JSON.stringify(allVideos.value));
-            preview.value = null; tempId.value = "";
+        const sendComment = () => {
+            if(!msg.value) return;
+            db.ref('comments/' + current.value.id).push({
+                name: user.value.name,
+                text: msg.value,
+                rating: rating.value,
+                time: Date.now()
+            });
+            msg.value = "";
+            alert("Đã gửi bình luận!");
         };
 
-        const play = (v) => { current.value = v; window.scrollTo({ top: 0, behavior: 'smooth' }); };
-
-        return { showAuth, currentUser, showAdmin, authForm, tempId, preview, selectedCat, current, userRating, userComment, allVideos, handleAuth, logout, postComment, currentComments, autoFetch, confirmPost, play };
+        return { user, showAuth, uInput, isAdminMode, videos, current, msg, rating, comments, tempId, login, logout, postVideo, sendComment };
     }
 }).mount('#app');
 </script>
