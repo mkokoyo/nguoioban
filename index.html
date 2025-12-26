@@ -12,113 +12,76 @@
         :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #fff; --sub-text: #888; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
         
-        /* HEADER - LOGO RỰC RỠ CĂN GIỮA */
+        /* HEADER - LUÔN HIỂN THỊ RỰC RỠ */
         nav { 
-            padding: 50px 5% 30px 5%; 
+            padding: 40px 5% 20px 5%; 
             background: linear-gradient(to bottom, #000, transparent); 
             display: flex; flex-direction: column; align-items: center; 
             position: sticky; top: 0; z-index: 1000;
         }
         .logo { 
             font-family: 'Montserrat', sans-serif;
-            font-weight: 900; font-size: 55px; 
+            font-weight: 900; font-size: 50px; 
             letter-spacing: 12px; text-transform: uppercase;
             color: #ffffff;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.3);
             position: relative;
         }
-        .logo span { 
-            color: var(--primary); 
-            text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary); 
-        }
+        .logo span { color: var(--primary); text-shadow: 0 0 20px var(--primary); }
         .logo::after {
-            content: ""; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 5px; background: var(--primary); 
-            box-shadow: 0 0 25px var(--primary), 0 0 50px var(--primary);
-            border-radius: 10px;
+            content: ""; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 4px; background: var(--primary); 
+            box-shadow: 0 0 20px var(--primary); border-radius: 10px;
         }
         .logo-sub { 
-            font-size: 14px; letter-spacing: 7px; color: #ffffff; 
-            text-transform: uppercase; margin-top: 25px; font-weight: 800;
+            font-size: 13px; letter-spacing: 6px; color: #ffffff; 
+            text-transform: uppercase; margin-top: 20px; font-weight: 800;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-            opacity: 1;
         }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        /* THEATER BOX - KHU VỰC TRÌNH PHÁT TÁCH BIỆT */
+        /* THEATER BOX */
         .theater-box { 
-            background: #0d0d0d; border-radius: 30px; padding: 30px; 
-            margin-bottom: 70px; border: 1px solid #1a1a1a;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9);
-            display: grid; grid-template-columns: 2fr 1fr; gap: 35px;
+            background: #0d0d0d; border-radius: 30px; padding: 25px; 
+            margin-bottom: 60px; border: 1px solid #1a1a1a;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            display: grid; grid-template-columns: 2fr 1fr; gap: 30px;
         }
         .video-wrapper { 
-            background: #000; border-radius: 20px; overflow: hidden; 
+            background: #000; border-radius: 16px; overflow: hidden; 
             position: relative; padding-bottom: 56.25%; height: 0; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .video-wrapper iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
-        .video-meta h2 { margin: 25px 0 15px 0; font-size: 28px; font-weight: 800; color: #fff; }
+        .video-meta h2 { margin: 20px 0 10px 0; font-size: 24px; font-weight: 800; color: #fff; }
 
-        .theater-sidebar { display: flex; flex-direction: column; gap: 20px; }
-        .sidebar-scroll { overflow-y: auto; max-height: 600px; padding-right: 15px; }
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .sidebar-scroll { overflow-y: auto; max-height: 550px; padding-right: 10px; }
+        .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--primary); }
         
         .mini-card { 
-            display: flex; gap: 15px; background: #161616; padding: 10px; 
-            border-radius: 15px; cursor: pointer; border: 1px solid transparent; 
-            transition: 0.3s; margin-bottom: 12px; 
+            display: flex; gap: 12px; background: #161616; padding: 8px; 
+            border-radius: 12px; cursor: pointer; transition: 0.3s; margin-bottom: 10px; 
         }
-        .mini-card:hover { border-color: var(--primary); background: #1f1f1f; transform: translateX(5px); }
-        .mini-card img { width: 120px; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; }
+        .mini-card:hover { border-color: var(--primary); background: #1f1f1f; }
+        .mini-card img { width: 110px; border-radius: 8px; aspect-ratio: 16/9; object-fit: cover; }
 
-        /* COMMENT AREA */
-        .comment-box { background: #111; padding: 25px; border-radius: 20px; margin-top: 25px; border: 1px solid #1a1a1a; }
-        textarea { 
-            width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #222; 
-            border-radius: 12px; padding: 15px; margin-bottom: 15px; resize: none; font-family: inherit; 
-        }
+        /* PHÂN CÁCH */
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, #222, transparent); margin: 60px 0; position: relative; }
+        .divider::after { content: "DANH SÁCH NỘI DUNG"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg); padding: 0 20px; color: #444; font-size: 11px; letter-spacing: 4px;}
 
-        /* PHÂN CÁCH DANH SÁCH */
-        .section-divider { 
-            height: 1px; background: linear-gradient(90deg, transparent, #333, transparent); 
-            margin: 80px 0; position: relative; 
-        }
-        .section-divider::after { 
-            content: "KHÁM PHÁ DANH SÁCH NỘI DUNG"; position: absolute; 
-            top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: var(--bg); padding: 0 30px; color: #555; 
-            font-size: 12px; letter-spacing: 5px; font-weight: bold;
-        }
+        /* ROWS */
+        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 20px; }
+        .video-card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.4s; cursor: pointer; }
+        .video-card:hover { transform: translateY(-8px); border-color: var(--primary); }
 
-        /* ROWS & PAGINATION */
-        .row-section { margin-bottom: 60px; }
-        .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .row-title { font-size: 22px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
-        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 25px; }
-        .video-card { 
-            background: var(--card); border-radius: 20px; overflow: hidden; 
-            border: 1px solid #1a1a1a; transition: 0.5s; cursor: pointer; 
-        }
-        .video-card:hover { transform: translateY(-12px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(255, 71, 87, 0.2); }
-        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .video-card .info { padding: 18px; }
-        .video-card h4 { margin: 0; font-size: 15px; line-height: 1.4; height: 42px; overflow: hidden; }
-
-        /* BUTTONS */
-        .btn-p { 
-            background: var(--primary); color: #fff; border: none; padding: 12px 25px; 
-            border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 13px; 
-            letter-spacing: 1px; transition: 0.3s;
-        }
-        .btn-p:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--primary); }
-        .btn-page { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 8px 18px; border-radius: 8px; cursor: pointer; }
-        .btn-page:disabled { opacity: 0.1; cursor: not-allowed; }
+        /* NÚT BẤM ẨN DƯỚI GÓC HOẶC NHỎ GỌN */
+        .admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.3; transition: 0.3s; z-index: 1000; }
+        .admin-trigger:hover { opacity: 1; }
+        .btn-p { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; }
 
         @media (max-width: 1200px) { :root { --cols: 3; } .theater-box { grid-template-columns: 1fr; } }
-        @media (max-width: 800px) { :root { --cols: 2; } .logo { font-size: 35px; letter-spacing: 8px; } .logo-sub { font-size: 10px; letter-spacing: 4px; } }
+        @media (max-width: 800px) { :root { --cols: 2; } .logo { font-size: 32px; letter-spacing: 6px; } }
     </style>
 </head>
 <body>
@@ -128,94 +91,90 @@
         <div class="logo">NGƯỜI Ở <span>BẢN</span></div>
         <div class="logo-sub">GÌN GIỮ BẢN SẮC - KẾT NỐI MUÔN PHƯƠNG</div>
         
-        <div style="display:flex; gap:20px; align-items:center; margin-top:30px;">
-            <span v-if="currentUser" style="font-size:12px; color:#fff; background:rgba(255,255,255,0.1); padding:6px 15px; border-radius:20px;">
-                MEMBER: <b style="color:var(--primary)">{{ currentUser.username }}</b>
-            </span>
-            <button v-if="!currentUser" class="btn-p" @click="authOpen = true">ĐĂNG NHẬP ADMIN</button>
+        <div style="margin-top:20px;">
             <button v-if="currentUser?.role==='admin'" class="btn-p" @click="adminOpen = !adminOpen">QUẢN LÝ VIDEO</button>
-            <button v-if="currentUser" @click="logout" style="background:none; border:none; color:#555; cursor:pointer; font-size:11px; font-weight: bold;">[ THOÁT ]</button>
+            <button v-if="currentUser" @click="logout" style="background:none; border:none; color:#333; cursor:pointer; font-size:10px; margin-left:10px;">[ THOÁT ]</button>
         </div>
     </nav>
 
     <div class="container">
-        <div v-if="adminOpen" style="background:#111; padding:30px; border-radius:25px; border:1px solid var(--primary); margin-bottom:50px;">
-            <h3 style="margin-top:0; color:var(--primary); letter-spacing:2px;">HỆ THỐNG ĐĂNG TẢI</h3>
+        <div v-if="adminOpen" style="background:#111; padding:20px; border-radius:20px; border:1px solid var(--primary); margin-bottom:40px;">
             <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:15px">
-                <input v-model="ytId" placeholder="Nhập mã ID YouTube (ví dụ: dQw4w9WgXcQ)" style="padding:15px; background:#000; border:1px solid #333; color:#fff; border-radius:10px;">
-                <select v-model="ytCat" style="padding:15px; background:#000; border:1px solid #333; color:#fff; border-radius:10px;">
+                <input v-model="ytId" placeholder="ID YouTube" style="padding:12px; background:#000; border:1px solid #333; color:#fff; border-radius:8px;">
+                <select v-model="ytCat" style="padding:12px; background:#000; border:1px solid #333; color:#fff; border-radius:8px;">
                     <option v-for="c in categories" :value="c">{{ c }}</option>
                 </select>
-                <button class="btn-p" @click="addVideo">LƯU VÀO BẢN</button>
+                <button class="btn-p" @click="addVideo">LƯU VIDEO</button>
             </div>
         </div>
 
         <div class="theater-box">
-            <div class="video-main-area">
+            <div class="main-content">
                 <div class="video-wrapper">
                     <iframe :src="'https://www.youtube.com/embed/' + current.id + '?autoplay=1'" allowfullscreen></iframe>
                 </div>
                 <div class="video-meta">
                     <h2>{{ current.title }}</h2>
                 </div>
-                
-                <div class="comment-box">
-                    <h4 style="margin:0 0 20px 0; color:var(--primary); letter-spacing:1px;">CỘNG ĐỒNG NGƯỜI Ở BẢN</h4>
+                <div class="comment-area" style="background:#111; padding:20px; border-radius:15px; margin-top:15px;">
+                    <h4 style="margin:0 0 15px 0; color:var(--primary)">BÌNH LUẬN</h4>
                     <div v-if="currentUser">
-                        <textarea v-model="cmtInput" placeholder="Hãy để lại lời nhắn của bạn..."></textarea>
-                        <button class="btn-p" @click="sendCmt">GỬI BÌNH LUẬN</button>
+                        <textarea v-model="cmtInput" style="width:100%; height:60px; background:#000; color:#fff; border:1px solid #222; border-radius:10px; padding:10px;" placeholder="Chia sẻ cảm nghĩ..."></textarea>
+                        <button class="btn-p" style="margin-top:10px" @click="sendCmt">GỬI</button>
                     </div>
-                    <p v-else style="color:#444; font-size:13px; font-style:italic;">Vui lòng đăng nhập để bình luận.</p>
+                    <p v-else style="color:#444; font-size:12px;">Đăng nhập để tham gia bình luận.</p>
                     
-                    <div style="margin-top:20px; max-height:200px; overflow-y:auto;">
-                        <div v-for="c in comments" style="padding:12px 0; border-bottom:1px solid #1a1a1a; font-size:14px;">
-                            <b style="color:var(--primary)">{{ c.name }}:</b> <span style="color:#ccc">{{ c.text }}</span>
+                    <div style="margin-top:15px; max-height:150px; overflow-y:auto;">
+                        <div v-for="c in comments" style="padding:8px 0; border-bottom:1px solid #1a1a1a; font-size:13px;">
+                            <b style="color:var(--primary)">{{ c.name }}:</b> {{ c.text }}
                         </div>
-                        <p v-if="comments.length === 0" style="color:#333; text-align:center; margin-top:20px;">Chưa có bình luận nào.</p>
                     </div>
                 </div>
             </div>
-
             <div class="theater-sidebar">
-                <h4 style="margin:0 0 5px 0; color:#444; font-size:14px; letter-spacing:2px;">VIDEO GỢI Ý</h4>
+                <h4 style="margin:0 0 15px 0; color:#444; letter-spacing:1px;">GỢI Ý VIDEO</h4>
                 <div class="sidebar-scroll">
                     <div v-for="v in randomVideos" class="mini-card" @click="playVideo(v)">
                         <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                        <h4 style="margin:0; font-size:13px; font-weight:500; line-height:1.4;">{{ v.title }}</h4>
+                        <h4 style="margin:0; font-size:13px; font-weight:normal;">{{ v.title }}</h4>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="section-divider"></div>
+        <div class="divider"></div>
 
         <div v-for="cat in categories" :key="cat" class="row-section" v-show="getVideosByCat(cat).length > 0">
-            <div class="row-header">
-                <div class="row-title">{{ cat }}</div>
-                <div class="page-controls" v-if="getVideosByCat(cat).length > itemsPerPage">
-                    <button class="btn-page" @click="changePage(cat, -1)" :disabled="pageMap[cat] === 0">◀</button>
-                    <button class="btn-page" @click="changePage(cat, 1)" :disabled="isLastPage(cat)">▶</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <div style="font-size:20px; font-weight:800; color:var(--primary); text-transform:uppercase;">{{ cat }}</div>
+                <div v-if="getVideosByCat(cat).length > itemsPerPage">
+                    <button @click="changePage(cat, -1)" :disabled="pageMap[cat] === 0" class="btn-p" style="padding:5px 10px;">◀</button>
+                    <button @click="changePage(cat, 1)" :disabled="isLastPage(cat)" class="btn-p" style="padding:5px 10px; margin-left:5px;">▶</button>
                 </div>
             </div>
             <div class="video-grid">
                 <div v-for="v in getPaginatedVideos(cat)" :key="v.key" class="video-card" @click="playVideo(v)">
                     <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <div class="info">
-                        <h4>{{ v.title }}</h4>
-                        <button v-if="currentUser?.role==='admin'" @click.stop="deleteVideo(v.key)" style="color:#ff4757; background:none; border:none; cursor:pointer; font-size:10px; margin-top:10px; font-weight:bold;">[ XÓA VIDEO ]</button>
+                    <div style="padding:15px;">
+                        <h4 style="margin:0; font-size:13px;">{{ v.title }}</h4>
+                        <button v-if="currentUser?.role==='admin'" @click.stop="deleteVideo(v.key)" style="color:red; background:none; border:none; cursor:pointer; font-size:9px; margin-top:5px;">[ XÓA ]</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div v-if="authOpen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:flex; justify-content:center; align-items:center; z-index:2000;">
-        <div style="background:#111; padding:50px; border-radius:30px; width:340px; text-align:center; border:1px solid #222;">
-            <h2 style="color:var(--primary); margin-bottom:30px; letter-spacing:2px;">ADMIN LOGIN</h2>
-            <input v-model="authForm.user" placeholder="Tài khoản" style="width:100%; padding:15px; margin-bottom:15px; background:#000; color:#fff; border:1px solid #333; border-radius:10px;">
-            <input type="password" v-model="authForm.pass" placeholder="Mật khẩu" style="width:100%; padding:15px; margin-bottom:25px; background:#000; color:#fff; border:1px solid #333; border-radius:10px;">
-            <button class="btn-p" style="width:100%" @click="login">XÁC NHẬN VÀO</button>
-            <button @click="authOpen = false" style="background:none; border:none; color:gray; margin-top:20px; cursor:pointer; font-weight:bold;">QUAY LẠI</button>
+    <div v-if="!currentUser" class="admin-trigger">
+        <button @click="authOpen = true" style="background:none; border:none; color:#222; cursor:pointer; font-size:10px;">QUẢN TRỊ</button>
+    </div>
+
+    <div v-if="authOpen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:2000;">
+        <div style="background:#111; padding:30px; border-radius:20px; width:280px; text-align:center;">
+            <h3 style="color:var(--primary); margin-bottom:20px;">ADMIN LOGIN</h3>
+            <input v-model="authForm.user" placeholder="User" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #222; border-radius:5px;">
+            <input type="password" v-model="authForm.pass" placeholder="Pass" style="width:100%; padding:10px; margin-bottom:20px; background:#000; color:#fff; border:1px solid #222; border-radius:5px;">
+            <button class="btn-p" style="width:100%" @click="login">VÀO</button>
+            <button @click="authOpen = false" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Đóng</button>
         </div>
     </div>
 </div>
@@ -225,4 +184,85 @@ const YT_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM";
 const fbConfig = {
     apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
     authDomain: "nguoioban-77943.firebaseapp.com",
-    databaseURL: "https://nguoioban
+    databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "nguoioban-77943",
+    storageBucket: "nguoioban-77943.firebasestorage.app",
+    appId: "1:96090638378:web:84c6d4c9ae26a87869db53"
+};
+
+firebase.initializeApp(fbConfig);
+const db = firebase.database();
+const { createApp, ref, onMounted, computed, watch } = Vue;
+
+createApp({
+    setup() {
+        const currentUser = ref(JSON.parse(localStorage.getItem('user_session')));
+        const adminOpen = ref(false); const authOpen = ref(false); const authForm = ref({user:'', pass:''});
+        const videos = ref([]); const current = ref({id:'', title:'Đang tải...'});
+        const categories = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
+        const pageMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
+        const itemsPerPage = ref(5);
+        const ytId = ref(""); const ytCat = ref("Video ngắn"); const cmtInput = ref(""); const comments = ref([]);
+
+        const updateItemsPerPage = () => {
+            const w = window.innerWidth;
+            itemsPerPage.value = w > 1200 ? 5 : (w > 800 ? 3 : 2);
+        };
+
+        onMounted(() => {
+            updateItemsPerPage(); window.addEventListener('resize', updateItemsPerPage);
+            db.ref('videos').on('value', s => {
+                const data = s.val();
+                if(data) {
+                    videos.value = Object.keys(data).map(k => ({key:k, ...data[k]})).reverse();
+                    if(!current.value.id && videos.value.length > 0) current.value = videos.value[0];
+                }
+            });
+        });
+
+        watch(() => current.value.id, (id) => {
+            if(id) db.ref('comments/' + id).on('value', s => {
+                const data = s.val();
+                comments.value = data ? Object.values(data).reverse() : [];
+            });
+        }, { immediate: true });
+
+        const getVideosByCat = (cat) => videos.value.filter(v => v.category === cat);
+        const getPaginatedVideos = (cat) => {
+            const list = getVideosByCat(cat);
+            const start = pageMap.value[cat] * itemsPerPage.value;
+            return list.slice(start, start + itemsPerPage.value);
+        };
+        const changePage = (cat, step) => { pageMap.value[cat] += step; };
+        const isLastPage = (cat) => (pageMap.value[cat] + 1) * itemsPerPage.value >= getVideosByCat(cat).length;
+        const randomVideos = computed(() => [...videos.value].sort(() => 0.5 - Math.random()).slice(0, 10));
+        const playVideo = (v) => { current.value = v; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        const login = () => {
+            if(authForm.value.user==='Admin' && authForm.value.pass==='cong1997') {
+                currentUser.value = {username:'Admin', role:'admin'};
+                localStorage.setItem('user_session', JSON.stringify(currentUser.value));
+                authOpen.value = false;
+            } else alert("Sai!");
+        };
+        const logout = () => { currentUser.value = null; localStorage.removeItem('user_session'); adminOpen.value = false; };
+        const addVideo = async () => {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${ytId.value}&key=${YT_KEY}`);
+            const json = await res.json();
+            if(json.items) {
+                db.ref('videos').push({ id: ytId.value, title: json.items[0].snippet.title, category: ytCat.value });
+                ytId.value = ""; alert("Đã thêm!");
+            }
+        };
+        const sendCmt = () => {
+            if(!cmtInput.value) return;
+            db.ref('comments/' + current.value.id).push({ name: currentUser.value.username, text: cmtInput.value });
+            cmtInput.value = "";
+        };
+        const deleteVideo = (k) => { if(confirm("Xóa?")) db.ref('videos/' + k).remove(); };
+
+        return { currentUser, adminOpen, authOpen, authForm, videos, current, categories, ytId, ytCat, cmtInput, comments, randomVideos, getVideosByCat, getPaginatedVideos, changePage, isLastPage, pageMap, itemsPerPage, playVideo, login, logout, addVideo, sendCmt, deleteVideo };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
