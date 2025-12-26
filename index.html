@@ -3,188 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Ở Bản - Trải Nghiệm Văn Hóa</title>
+    <title>Người Ở Bản - Sáng Sủa & Rực Rỡ</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #fdfdfd; 
-            --card: #ffffff; 
+            --bg: #ffffff; 
+            --card: #f8f9fa; 
             --primary: #ff4757; 
-            --text: #1a1a1a; 
-            --shadow: 0 10px 40px rgba(0,0,0,0.06);
+            --text: #2d3436; 
+            --shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
         
-        /* HEADER RỰC RỠ */
-        nav { 
-            padding: 60px 5% 40px; 
-            background: #fff; text-align: center;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        /* LOGO CHÍNH - RỰC RỠ TRÊN NỀN SÁNG */
+        header { 
+            padding: 50px 0; text-align: center; background: #fff;
+            border-bottom: 4px solid var(--primary);
         }
         .logo { 
-            font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 52px; 
-            letter-spacing: 12px; text-transform: uppercase; color: #222; 
+            font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 55px; 
+            letter-spacing: 12px; text-transform: uppercase; color: #000;
             position: relative; display: inline-block;
         }
         .logo span { color: var(--primary); }
-        .logo::after { 
-            content: ""; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); 
-            width: 100px; height: 5px; background: var(--primary); border-radius: 5px;
-        }
         .logo-sub { 
-            font-size: 15px; letter-spacing: 8px; color: #888; 
-            text-transform: uppercase; margin-top: 30px; font-weight: 700;
+            font-size: 14px; letter-spacing: 7px; color: #636e72; 
+            text-transform: uppercase; margin-top: 25px; font-weight: 800;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
 
         /* THEATER BOX */
-        .theater-box { 
-            background: #fff; border-radius: 35px; padding: 30px; 
-            display: grid; grid-template-columns: 2fr 1fr; gap: 35px;
-            box-shadow: var(--shadow); border: 1px solid #f0f0f0; margin-bottom: 60px;
+        .theater { 
+            display: grid; grid-template-columns: 2fr 1fr; gap: 30px; 
+            background: #fff; padding: 25px; border-radius: 30px;
+            box-shadow: var(--shadow); margin-bottom: 60px;
         }
-        .video-wrapper { 
-            background: #000; border-radius: 20px; overflow: hidden; 
-            position: relative; padding-bottom: 56.25%; height: 0;
-        }
-        .video-wrapper iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
-        .video-meta h2 { margin: 25px 0; font-size: 26px; color: #222; font-weight: 900; }
+        .v-main { background: #000; border-radius: 20px; overflow: hidden; position: relative; padding-bottom: 56.25%; height: 0; }
+        .v-main iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
         
-        /* SIDEBAR */
-        .sidebar-scroll { overflow-y: auto; max-height: 600px; padding-right: 10px; }
-        .mini-card { 
-            display: flex; gap: 15px; background: #fafafa; padding: 12px; 
-            border-radius: 15px; cursor: pointer; transition: 0.3s; margin-bottom: 12px;
-            border: 1px solid #eee;
+        .sidebar-list { overflow-y: auto; max-height: 500px; padding-right: 10px; }
+        .v-item { 
+            display: flex; gap: 15px; padding: 10px; border-radius: 12px; 
+            cursor: pointer; transition: 0.3s; border: 1px solid #eee; margin-bottom: 10px;
         }
-        .mini-card:hover { border-color: var(--primary); background: #fff; transform: translateX(5px); }
-        .mini-card img { width: 130px; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; }
+        .v-item:hover { border-color: var(--primary); background: #fff5f6; }
+        .v-item img { width: 110px; border-radius: 8px; aspect-ratio: 16/9; object-fit: cover; }
 
-        /* DANH MỤC */
-        .row-section { margin-bottom: 60px; }
-        .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 6px solid var(--primary); padding-left: 15px; }
-        .row-title { font-size: 22px; font-weight: 900; color: #222; text-transform: uppercase; }
-        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 25px; }
-        .video-card { background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid #eee; transition: 0.4s; cursor: pointer; }
-        .video-card:hover { transform: translateY(-10px); box-shadow: var(--shadow); border-color: var(--primary); }
-        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .video-card h4 { padding: 15px; margin: 0; font-size: 14px; line-height: 1.4; height: 40px; overflow: hidden; }
+        /* GRID VIDEO DƯỚI */
+        .row-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 25px; border-left: 8px solid var(--primary); padding-left: 15px; }
+        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 25px; margin-bottom: 60px; }
+        .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.4s; cursor: pointer; border: 1px solid #f0f0f0; }
+        .card:hover { transform: translateY(-10px); box-shadow: var(--shadow); border-color: var(--primary); }
+        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .card h4 { padding: 15px; margin: 0; font-size: 14px; color: #333; height: 40px; overflow: hidden; }
 
-        /* ADMIN AREA */
-        .admin-box { background: #fff; padding: 30px; border-radius: 25px; border: 2px dashed var(--primary); margin-bottom: 40px; }
-        .btn-p { background: var(--primary); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 800; }
-        .btn-page { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        /* ADMIN AREA - CỐ ĐỊNH Ở CUỐI TRANG */
+        footer { background: #f1f2f6; padding: 60px 0; margin-top: 100px; border-top: 1px solid #ddd; }
+        .admin-box { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .input-group { display: flex; flex-direction: column; gap: 15px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+        .btn-p { background: var(--primary); color: #fff; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 16px; }
 
-        /* MODAL FIX */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.98); display: flex; 
-            justify-content: center; align-items: center; z-index: 99999; 
-        }
-
-        .admin-trigger { position: fixed; bottom: 20px; right: 20px; color: #ccc; background: none; border: none; font-size: 10px; cursor: pointer; font-weight: bold; }
-        .admin-trigger:hover { color: var(--primary); }
-
-        @media (max-width: 1200px) { :root { --cols: 3; } .theater-box { grid-template-columns: 1fr; } }
-        @media (max-width: 800px) { :root { --cols: 2; } .logo { font-size: 35px; } }
+        @media (max-width: 1000px) { .theater { grid-template-columns: 1fr; } :root { --cols: 2; } }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <nav>
+    <header>
         <div class="logo">NGƯỜI Ở <span>BẢN</span></div>
         <div class="logo-sub">GÌN GIỮ BẢN SẮC - KẾT NỐI MUÔN PHƯƠNG</div>
-        
-        <div v-if="currentUser" style="margin-top:25px;">
-            <button class="btn-p" @click="adminOpen = !adminOpen">BẢNG QUẢN LÝ VIDEO</button>
-            <button @click="logout" style="margin-left:10px; border:none; background:none; color:gray; cursor:pointer;">[ Thoát ]</button>
-        </div>
-    </nav>
+    </header>
 
     <div class="container">
-        <div v-if="currentUser && adminOpen" class="admin-box">
-            <h3 style="color:var(--primary); margin-top:0;">ĐĂNG VIDEO MỚI</h3>
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:15px;">
-                <input v-model="ytId" placeholder="Mã ID YouTube" style="padding:15px; border:1px solid #ddd; border-radius:10px;">
-                <select v-model="ytCat" style="padding:15px; border:1px solid #ddd; border-radius:10px;">
-                    <option v-for="c in categories" :value="c">{{ c }}</option>
-                </select>
-                <button class="btn-p" @click="addVideo">LƯU VIDEO</button>
-            </div>
-        </div>
-
-        <div class="theater-box">
-            <div class="video-section">
-                <div class="video-wrapper">
+        <div class="theater">
+            <div>
+                <div class="v-main">
                     <iframe :src="'https://www.youtube.com/embed/' + current.id + '?autoplay=1'" allowfullscreen></iframe>
                 </div>
-                <div class="video-meta">
-                    <h2>{{ current.title }}</h2>
-                </div>
-                <div style="background:#f9f9f9; padding:25px; border-radius:20px;">
-                    <h4 style="color:var(--primary); margin-top:0;">BÌNH LUẬN</h4>
-                    <div v-if="currentUser">
-                        <textarea v-model="cmtInput" style="width:100%; height:70px; border:1px solid #ddd; border-radius:10px; padding:10px; font-family:inherit;"></textarea>
-                        <button class="btn-p" style="margin-top:10px" @click="sendCmt">GỬI</button>
-                    </div>
-                    <div style="margin-top:20px; max-height:200px; overflow-y:auto;">
-                        <div v-for="c in comments" style="padding:10px 0; border-bottom:1px solid #eee;">
-                            <b style="color:var(--primary)">{{ c.name }}:</b> {{ c.text }}
-                        </div>
-                    </div>
-                </div>
+                <h2 style="margin: 25px 0; font-size: 28px;">{{ current.title }}</h2>
             </div>
-            <div class="sidebar">
-                <h4 style="color:#aaa; font-size:12px; letter-spacing:2px; margin-bottom:20px;">GỢI Ý CHO BẠN</h4>
-                <div class="sidebar-scroll">
-                    <div v-for="v in randomVideos" class="mini-card" @click="playVideo(v)">
-                        <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                        <h4 style="margin:0; font-size:13px; font-weight:600;">{{ v.title }}</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div v-for="cat in categories" :key="cat" class="row-section" v-show="getVideosByCat(cat).length > 0">
-            <div class="row-header">
-                <div class="row-title">{{ cat }}</div>
-                <div v-if="getVideosByCat(cat).length > itemsPerPage">
-                    <button class="btn-page" @click="changePage(cat, -1)" :disabled="pageMap[cat] === 0">◀</button>
-                    <button class="btn-page" @click="changePage(cat, 1)" :disabled="isLastPage(cat)" style="margin-left:5px;">▶</button>
-                </div>
-            </div>
-            <div class="video-grid">
-                <div v-for="v in getPaginatedVideos(cat)" :key="v.key" class="video-card" @click="playVideo(v)">
+            <div class="sidebar-list">
+                <h4 style="color:#999; margin-bottom:15px; letter-spacing:1px;">VIDEO GỢI Ý</h4>
+                <div v-for="v in randomVideos" class="v-item" @click="playVideo(v)">
                     <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <div style="position:relative;">
-                        <h4>{{ v.title }}</h4>
-                        <button v-if="currentUser" @click.stop="deleteVideo(v.key)" style="position:absolute; top:-30px; right:10px; background:red; color:white; border:none; padding:3px 8px; border-radius:5px; font-size:10px; cursor:pointer;">Xóa</button>
-                    </div>
+                    <div style="font-size:13px; font-weight:700;">{{ v.title }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div v-for="cat in categories" :key="cat" v-show="getVideosByCat(cat).length > 0">
+            <div class="row-title">{{ cat }}</div>
+            <div class="video-grid">
+                <div v-for="v in getVideosByCat(cat)" :key="v.key" class="card" @click="playVideo(v)">
+                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                    <h4>{{ v.title }}</h4>
+                    <div v-if="currentUser" @click.stop="deleteVideo(v.key)" style="color:red; font-size:11px; padding:10px; text-align:right;">[ XÓA ]</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <button v-if="!currentUser" class="admin-trigger" @click="openAuthModal">QUẢN TRỊ VIÊN</button>
+    <footer>
+        <div class="container">
+            <div class="admin-box">
+                <h2 style="text-align:center; color:var(--primary); margin-top:0;">QUẢN TRỊ VIÊN</h2>
+                
+                <div v-if="!currentUser" class="input-group">
+                    <p style="text-align:center; font-size:13px; color:#888;">Chỉ dành cho chủ sở hữu trang web</p>
+                    <input v-model="loginForm.user" placeholder="Tên tài khoản">
+                    <input type="password" v-model="loginForm.pass" placeholder="Mật khẩu">
+                    <button class="btn-p" @click="handleLogin">ĐĂNG NHẬP HỆ THỐNG</button>
+                </div>
 
-    <div v-if="authOpen" class="modal-overlay">
-        <div style="background:#fff; padding:40px; border-radius:30px; width:300px; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.1); border:1px solid #f0f0f0;">
-            <h2 style="color:var(--primary); margin-bottom:30px;">HỆ THỐNG</h2>
-            <input v-model="authForm.user" placeholder="Tên đăng nhập" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd; border-radius:10px; font-size:16px;">
-            <input type="password" v-model="authForm.pass" placeholder="Mật khẩu" style="width:100%; padding:15px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; font-size:16px;">
-            <button class="btn-p" style="width:100%" @click="login">XÁC NHẬN</button>
-            <button @click="authOpen = false" style="margin-top:20px; background:none; border:none; color:#ccc; cursor:pointer; font-weight:bold;">ĐÓNG</button>
+                <div v-else class="input-group">
+                    <p style="color:green; font-weight:bold; text-align:center;">Chào Quản trị viên!</p>
+                    <input v-model="newVidId" placeholder="Nhập ID Video YouTube">
+                    <select v-model="newVidCat">
+                        <option v-for="c in categories" :value="c">{{ c }}</option>
+                    </select>
+                    <button class="btn-p" @click="addVideo">LƯU VIDEO VÀO BẢN</button>
+                    <button @click="logout" style="background:none; border:none; color:gray; cursor:pointer; text-decoration:underline;">Đăng xuất</button>
+                </div>
+            </div>
         </div>
-    </div>
+    </footer>
 </div>
 
 <script>
-const YT_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM";
+// CẤU HÌNH FIREBASE
 const fbConfig = {
-    apiKey: "AIzaSyC96V7VVvxtEpn9
+    apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
+    authDomain: "nguoioban-77943.firebaseapp.com",
+    databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "nguoioban-77943",
+    storageBucket: "nguoioban-77943.firebasestorage.app",
+    appId: "1:96090638378:web:84c6d4c9ae26a87869db53"
+};
+firebase.initializeApp(fbConfig);
+const db = firebase.database();
+
+const { createApp, ref, onMounted, computed } = Vue;
+
+createApp({
+    setup() {
+        const currentUser = ref(null);
+        const loginForm = ref({user:'', pass:''});
+        const videos = ref([]);
+        const current = ref({id:'', title:'Đang tải video...'});
+        const categories = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
+        
+        const newVidId = ref("");
+        const newVidCat = ref("Video ngắn");
+
+        onMounted(() => {
+            // Kiểm tra session cũ
+            const savedUser = localStorage.getItem('user_ban');
+            if(savedUser) currentUser.value = JSON.parse(savedUser);
+
+            // Lấy video từ Firebase
+            db.ref('videos').on('value', snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    videos.value = Object.keys(data).map(k => ({key:k, ...data[k]})).reverse();
+                    if(!current.value.id && videos.value.length > 0) current.value = videos.value[0];
+                }
+            });
+        });
+
+        const handleLogin = () => {
+            if(loginForm.value.user === 'Admin' && loginForm.value.pass === 'cong1997') {
+                currentUser.value = {name: 'Admin'};
+                localStorage.setItem('user_ban', JSON.stringify(currentUser.value));
+                alert("Đăng nhập thành công!");
+            } else {
+                alert("Thông tin sai!");
+            }
+        };
+
+        const logout = () => {
+            currentUser.value = null;
+            localStorage.removeItem('user_ban');
+        };
+
+        const addVideo = async () => {
+            if(!newVidId.value) return;
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newVidId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
+            const json = await res.json();
+            if(json.items && json.items.length > 0) {
+                db.ref('videos').push({
+                    id: newVidId.value,
+                    title: json.items[0].snippet.title,
+                    category: newVidVidCat.value
+                });
+                newVidId.value = "";
+                alert("Đã thêm thành công!");
+            } else {
+                alert("ID Video không hợp lệ!");
+            }
+        };
+
+        const deleteVideo = (key) => {
+            if(confirm("Xóa video này?")) db.ref('videos/' + key).remove();
+        };
+
+        const playVideo = (v) => {
+            current.value = v;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+
+        const getVideosByCat = (cat) => videos.value.filter(v => v.category === cat);
+        const randomVideos = computed(() => [...videos.value].sort(() => 0.5 - Math.random()).slice(0, 10));
+
+        return { 
+            currentUser, loginForm, handleLogin, logout, 
+            videos, current, categories, newVidId, newVidCat, 
+            addVideo, deleteVideo, playVideo, getVideosByCat, randomVideos 
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
