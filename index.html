@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Ở Bản - Giao Diện Phân Khu Rõ Ràng</title>
+    <title>Người Ở Bản - Giao Diện Hoàn Hảo</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -16,7 +16,7 @@
         .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 45px; letter-spacing: 10px; text-transform: uppercase; cursor: pointer; user-select: none; }
         .logo span { color: var(--primary); }
 
-        .container { max-width: 1300px; margin: 0 auto; padding: 30px 20px; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; }
 
         /* THEATER */
         .theater { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px; }
@@ -28,20 +28,18 @@
         .v-item:hover { background: #fff; box-shadow: var(--shadow); }
         .v-item img { width: 110px; border-radius: 8px; }
 
-        /* THANH TIÊU ĐỀ KÉO DÀI TOÀN MÀN HÌNH */
-        .cat-row-wrapper { 
-            width: 100vw; 
-            margin-left: calc(-50vw + 50%); 
+        /* THANH TIÊU ĐỀ KÉO DÀI AN TOÀN */
+        .cat-row-header { 
             background: var(--gray-bg); 
-            border-top: 1px solid #eee; 
-            border-bottom: 1px solid #eee; 
-            margin-top: 60px;
-            margin-bottom: 30px;
+            margin: 60px 0 30px 0;
+            padding: 15px 0;
+            /* Tạo hiệu ứng dải màu tràn cánh bằng shadow cực rộng */
+            box-shadow: 0 0 0 100vmax var(--gray-bg);
+            clip-path: inset(0 -100vmax); 
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
         }
         .cat-header-content { 
-            max-width: 1300px; 
-            margin: 0 auto; 
-            padding: 15px 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -53,11 +51,11 @@
         /* PHÂN TRANG */
         .nav-btns { display: flex; gap: 10px; }
         .btn-arrow { 
-            width: 38px; height: 38px; border-radius: 50%; border: 1px solid #ddd;
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd;
             background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s; font-size: 16px; 
+            transition: 0.3s; font-size: 18px; 
         }
-        .btn-arrow:hover:not(:disabled) { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .btn-arrow:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.1); }
         .btn-arrow:disabled { opacity: 0.2; }
 
         /* GRID VIDEO */
@@ -72,12 +70,12 @@
         .cmt-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; font-family: inherit; box-sizing: border-box; }
         .btn-p { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 800; }
 
-        /* MODAL ADMIN */
+        /* MODAL */
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.98); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .modal-box { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        .admin-bar { background: #fff5f6; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--primary); display: flex; gap: 10px; }
+        .admin-bar { background: #fff5f6; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--primary); display: flex; gap: 10px; align-items: center; }
 
-        footer { text-align: center; padding: 60px; color: #bbb; font-size: 11px; letter-spacing: 2px; border-top: 1px solid #eee; margin-top: 100px; }
+        footer { text-align: center; padding: 60px; color: #bbb; font-size: 11px; letter-spacing: 2px; margin-top: 100px; }
 
         @media (max-width: 1200px) { :root { --cols: 3; } .theater { grid-template-columns: 1fr; } }
         @media (max-width: 800px) { :root { --cols: 2; } }
@@ -88,16 +86,16 @@
 <div id="app">
     <header>
         <div class="logo" @click="showAuth = true">NGƯỜI Ở <span>BẢN</span></div>
-        <div style="font-size: 13px; letter-spacing: 5px; color: #888; margin-top: 15px; font-weight: 700;">GÌN GIỮ BẢN SẮC - KẾT NỐI MUÔN PHƯƠNG</div>
+        <div style="font-size: 13px; letter-spacing: 5px; color: #888; margin-top: 15px; font-weight: 700; text-align: center;">GÌN GIỮ BẢN SẮC - KẾT NỐI MUÔN PHƯƠNG</div>
     </header>
 
     <div class="container">
         <div v-if="isLoggedIn" class="admin-bar">
-            <input v-model="newId" placeholder="Dán ID YouTube" style="flex:2; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            <input v-model="newId" placeholder="Mã video YouTube" style="flex:2; padding:10px; border-radius:8px; border:1px solid #ddd;">
             <select v-model="newCat" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;">
                 <option v-for="c in categories" :value="c">{{c}}</option>
             </select>
-            <button class="btn-p" @click="addVideo">LƯU VIDEO</button>
+            <button class="btn-p" @click="addVideo">LƯU</button>
             <button @click="logout" style="border:none; background:none; color:gray; cursor:pointer;">Thoát</button>
         </div>
 
@@ -111,18 +109,11 @@
                 <div class="cmt-box">
                     <h4 style="margin:0 0 15px 0; color:var(--primary); text-transform:uppercase;">Gửi bình luận</h4>
                     <input v-model="userName" placeholder="Tên của bạn..." class="cmt-input">
-                    <textarea v-model="cmtText" class="cmt-input" placeholder="Bạn nghĩ gì về video này?" style="height:70px; resize:none;"></textarea>
-                    <button class="btn-p" @click="sendComment">GỬI BÌNH LUẬN</button>
+                    <textarea v-model="cmtText" class="cmt-input" placeholder="Viết cảm nghĩ..." style="height:70px; resize:none;"></textarea>
+                    <button class="btn-p" @click="sendComment">GỬI</button>
                     <div style="max-height: 200px; overflow-y: auto; margin-top: 15px;">
                         <div v-for="c in comments" :key="c.key" style="padding:10px 0; border-bottom:1px solid #eee; position:relative;">
                             <b style="color:var(--primary); font-size:13px;">{{ c.name }}:</b> <span style="font-size:14px;">{{ c.text }}</span>
                             <button v-if="isLoggedIn" @click="deleteCmt(c.key)" style="float:right; border:none; color:red; background:none; cursor:pointer;">Xóa</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="sidebar">
-                <p style="font-weight:bold; color:#aaa; font-size:11px; margin-bottom:15px; letter-spacing:1px;">VIDEO ĐỀ XUẤT</p>
-                <div v-for="v in videos.slice(0,12)" class="v-item" @click="playVideo(v)">
-                    <img :src="'
