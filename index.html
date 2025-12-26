@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Người Ở Bản - Kết nối yêu thương</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root { --primary: #ff4757; --bg: #ffffff; --dark: #121212; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; }
         
+        /* Chống hiển thị dấu {{ }} khi đang tải */
+        [v-cloak] { display: none; }
+        
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; }
         header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(22px, 5vw, 35px); letter-spacing: 5px; text-transform: uppercase; cursor: pointer; }
         .logo span { color: var(--primary); }
         
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-        /* Player Area */
         .main-player-area { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin: 30px 0; }
         .video-box-container { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
         .video-box-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
@@ -29,16 +32,13 @@
         .vote-btn { cursor: pointer; border: 1px solid #ddd; padding: 8px 20px; border-radius: 25px; background: #fff; transition: 0.3s; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .vote-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* Sidebar */
         .sidebar { background: #f9f9f9; border-radius: 20px; padding: 25px; border: 1px solid #eee; height: fit-content; }
         .side-item { display:flex; gap:15px; margin-bottom:15px; cursor:pointer; align-items: flex-start; transition: 0.3s; padding: 10px; border-radius: 12px; }
         .side-item:hover { background: #fff; transform: translateX(5px); }
         .side-item img { border-radius:8px; width: 110px; flex-shrink: 0; aspect-ratio: 16/9; object-fit: cover; }
-        
-        /* FIX TIÊU ĐỀ SIDEBAR */
         .side-title { font-size: 13px; font-weight: 700; line-height: 1.5; color: #222; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
-        /* Categories */
+        /* Chuyên mục màu sắc */
         .cat-video-ngắn { --cat-color: #ff4757; --cat-bg: #fff5f6; }
         .cat-cuộc-sống-thường-ngày { --cat-color: #2ed573; --cat-bg: #f0fff4; }
         .cat-ẩm-thực-làng-quê { --cat-color: #ffa502; --cat-bg: #fffaf0; }
@@ -50,26 +50,13 @@
         .cat-vạch { width: 8px; height: 35px; background: var(--cat-color); border-radius: 4px; }
         .cat-name { font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 0; }
 
-        /* Video Grid */
         .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 20px; }
         .v-card { cursor: pointer; transition: 0.3s; }
         .v-card img { width: 100%; border-radius: 15px; border: 2px solid transparent; transition: 0.3s; margin-bottom: 12px; aspect-ratio: 16/9; object-fit: cover; }
         .v-card:hover img { border-color: var(--cat-color); transform: translateY(-5px); }
         
-        /* FIX TIÊU ĐỀ VIDEO GRID - HIỂN THỊ ĐẦY ĐỦ HƠN */
-        .v-card h4 { 
-            font-size: 14px; 
-            margin: 0; 
-            font-weight: 700; 
-            line-height: 1.5; 
-            min-height: 42px; /* Tương đương 2 dòng */
-            max-height: 63px; /* Tương đương 3 dòng */
-            overflow: hidden; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 3; 
-            -webkit-box-orient: vertical; 
-            color: #1a1a1a;
-        }
+        /* Hiển thị tiêu đề đầy đủ */
+        .v-card h4 { font-size: 14px; margin: 0; font-weight: 700; line-height: 1.5; min-height: 42px; max-height: 63px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; color: #1a1a1a; }
         
         .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--cat-color); background: #fff; color: var(--cat-color); cursor: pointer; font-weight: bold; }
         .nav-btn:disabled { opacity: 0.2; }
@@ -83,7 +70,7 @@
 </head>
 <body>
 
-<div id="app">
+<div id="app" v-cloak>
     <header>
         <div class="logo" @click="promptAdmin">NGƯỜI Ở <span>BẢN</span></div>
     </header>
@@ -98,7 +85,7 @@
             <button @click="isAdmin=false" style="padding:10px; background:none; border:none; color:gray; cursor:pointer;">Đóng</button>
         </div>
 
-        <div class="main-player-area" v-if="current.id">
+        <div class="main-player-area" v-if="current && current.id">
             <div class="player-left">
                 <div class="video-box-container">
                     <iframe :key="current.id" 
@@ -147,7 +134,7 @@
                             <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
                             <h4>{{ v.title }}</h4>
                             <div style="font-size:12px; color:#888; margin-top:8px;">👁️ {{ v.views || 0 }} • ❤️ {{ v.likes || 0 }}</div>
-                            <button v-if="isAdmin" @click.stop="deleteVid(v.key)" style="color:red; border:none; background:none; cursor:pointer; font-size:11px; margin-top:10px; font-weight:bold;">[XÓA VIDEO]</button>
+                            <button v-if="isAdmin" @click.stop="deleteVid(v.key)" style="color:red; border:none; background:none; cursor:pointer; font-size:11px; margin-top:10px; font-weight:bold;">[XÓA]</button>
                         </div>
                     </div>
                 </div>
@@ -162,6 +149,7 @@
 </div>
 
 <script>
+// Khởi tạo Firebase
 const fbConfig = {
     apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
     authDomain: "nguoioban-77943.firebaseapp.com",
@@ -176,7 +164,7 @@ const { createApp, ref, onMounted, computed } = Vue;
 createApp({
     setup() {
         const videos = ref([]);
-        const current = ref({});
+        const current = ref(null);
         const categories = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
         const pageMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
         const itemsPerPage = ref(5);
@@ -196,4 +184,36 @@ createApp({
         const changeVideo = (v) => {
             current.value = v;
             db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1);
-            window
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+
+        const vote = () => {
+            if(!current.value || hasVoted.value) return;
+            db.ref(`videos/${current.value.key}/likes`).transaction(l => (l || 0) + 1);
+            db.ref(`videos/${current.value.key}/voters/${userIP.value}`).set(true);
+        };
+
+        const hasVoted = computed(() => {
+            return current.value && current.value.voters && current.value.voters[userIP.value];
+        });
+
+        const randomList = computed(() => {
+            if (!current.value) return [];
+            return videos.value.filter(v => v.id !== current.value.id).sort(() => 0.5 - Math.random()).slice(0, 5);
+        });
+
+        const getVidsByCat = (cat) => videos.value.filter(v => v.category === cat);
+        const getPagedVids = (cat) => getVidsByCat(cat).slice(pageMap.value[cat]*itemsPerPage.value, (pageMap.value[cat]+1)*itemsPerPage.value);
+        const isLastPage = (cat) => (pageMap.value[cat]+1)*itemsPerPage.value >= getVidsByCat(cat).length;
+
+        const promptAdmin = () => {
+            const p = prompt("Nhập mã bảo mật:");
+            if(p === 'cong1997') isAdmin.value = true;
+        };
+
+        const addVideo = async () => {
+            if(!newId.value) return;
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
+                const data = await res.json();
+                if(data
