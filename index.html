@@ -3,45 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Video Universe</title>
+    <title>Gemini Studio - Video & Community</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); }
+        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; --accent: #2ecc71; --gold: #f1c40f; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
         
         nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #222; position: sticky; top:0; z-index:100; }
-        .logo { font-weight: 900; font-size: 26px; color: var(--primary); text-transform: uppercase; }
-        .admin-btn { background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .logo { font-weight: 900; font-size: 24px; color: var(--primary); text-transform: uppercase; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
 
-        .container { max-width: 1300px; margin: 20px auto; padding: 0 20px; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
 
-        /* Tỉ lệ mới: Player nhỏ hơn, Sidebar lớn hơn */
-        .hero-section { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 50px; }
-        .main-player { background: var(--card); border-radius: 12px; overflow: hidden; height: fit-content; }
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
-        .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
+        /* Giao diện Đăng nhập/Đăng ký */
+        .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .auth-box { background: #1a1a1a; padding: 30px; border-radius: 12px; width: 350px; border: 1px solid #333; }
+        .auth-box input { width: 90%; padding: 12px; margin: 10px 0; background: #000; color: white; border: 1px solid #444; border-radius: 6px; }
+
+        /* Hero Layout */
+        .hero { display: grid; grid-template-columns: 1.6fr 1fr; gap: 25px; margin-bottom: 40px; }
+        .player-main { background: var(--card); border-radius: 12px; overflow: hidden; }
+        .video-ratio { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+        .video-ratio iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
         
-        .sidebar-list { background: var(--card); padding: 15px; border-radius: 12px; height: 450px; overflow-y: auto; }
-        .side-item { display: flex; gap: 15px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
-        .side-item:hover { background: #222; border-radius: 8px; }
-        .side-item img { width: 160px; height: 90px; border-radius: 8px; object-fit: cover; }
-        .side-item div h4 { margin: 0; font-size: 15px; color: #fff; }
+        /* Bình luận & Đánh giá */
+        .comment-section { margin-top: 25px; background: #111; padding: 20px; border-radius: 12px; }
+        .star-rating { color: var(--gold); font-size: 20px; cursor: pointer; margin-bottom: 10px; }
+        .comment-input { width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; padding: 10px; box-sizing: border-box; }
+        .comment-list { margin-top: 20px; }
+        .comment-item { padding: 15px; border-bottom: 1px solid #222; }
+        .user-tag { font-weight: bold; color: var(--primary); font-size: 14px; }
 
-        /* Playlists */
-        .playlist-row { margin-bottom: 40px; }
-        .playlist-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; border-left: 5px solid var(--primary); padding-left: 15px; color: var(--primary); }
-        .video-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-        .grid-item { cursor: pointer; transition: 0.3s; text-align: center; }
-        .grid-item img { width: 100%; border-radius: 8px; aspect-ratio: 16/9; }
-        .grid-item p { font-size: 13px; margin: 5px 0; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* Admin & Sidebar */
+        .admin-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border: 1px solid var(--primary); margin-bottom: 30px; }
+        .sidebar { background: var(--card); padding: 15px; border-radius: 12px; max-height: 600px; overflow-y: auto; }
+        .side-card { display: flex; gap: 12px; cursor: pointer; margin-bottom: 15px; }
+        .side-card img { width: 130px; border-radius: 6px; }
 
-        /* Admin Dashboard */
-        .admin-modal { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 30px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        input, select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 5px; }
-        .btn-post { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-s { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
 
-        @media (max-width: 900px) { .hero-section { grid-template-columns: 1fr; } .video-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -49,54 +51,91 @@
 <div id="app">
     <nav>
         <div class="logo">GEMINI STUDIO</div>
-        <button class="admin-btn" @click="isAdmin = !isAdmin">🔧 Quản lý hệ thống</button>
+        <div class="nav-actions">
+            <button v-if="!currentUser" class="btn-s" @click="showAuth = 'login'">Đăng nhập</button>
+            <div v-else style="display:flex; gap:15px; align-items:center;">
+                <span style="font-size:14px; color:var(--accent)">👋 Chào, {{ currentUser.name }}</span>
+                <button class="btn-s" style="padding:5px 10px; font-size:12px;" @click="logout">Thoát</button>
+                <button v-if="currentUser.role === 'admin'" class="btn-p" @click="showAdmin = !showAdmin">Admin</button>
+            </div>
+        </div>
     </nav>
 
+    <div v-if="showAuth" class="auth-modal">
+        <div class="auth-box">
+            <h3>{{ showAuth === 'login' ? 'Đăng nhập' : 'Tạo tài khoản' }}</h3>
+            <input v-model="authForm.user" placeholder="Tên tài khoản">
+            <input type="password" v-model="authForm.pass" placeholder="Mật khẩu">
+            <button class="btn-p" style="width:100%" @click="handleAuth">{{ showAuth === 'login' ? 'Vào hệ thống' : 'Hoàn tất đăng ký' }}</button>
+            <p style="font-size:12px; color:gray; cursor:pointer; text-align:center" @click="showAuth = (showAuth === 'login' ? 'reg' : 'login')">
+                {{ showAuth === 'login' ? 'Chưa có tài khoản? Đăng ký ngay' : 'Đã có tài khoản? Đăng nhập' }}
+            </p>
+            <button class="btn-s" style="width:100%; margin-top:5px" @click="showAuth = null">Đóng</button>
+        </div>
+    </div>
+
     <div class="container">
-        <div v-if="isAdmin" class="admin-modal">
-            <h3 style="margin:0">➕ Đăng Video Mới</h3>
-            <div class="form-row">
-                <input v-model="newVideo.title" placeholder="Tiêu đề video...">
-                <input v-model="newVideo.id" placeholder="ID YouTube (vd: dQw4w9WgXcQ)">
-                <select v-model="newVideo.category">
-                    <option value="short">Video Ngắn</option>
-                    <option value="daily">Cuộc sống thường ngày</option>
-                    <option value="food">Ẩm thực làng quê</option>
-                    <option value="explore">Góc khám phá</option>
-                </select>
+        <div v-if="showAdmin" class="admin-box">
+            <h3>🚀 Đăng Video Siêu Tốc (Dành cho Admin)</h3>
+            <div style="display:flex; gap:10px">
+                <input v-model="tempId" placeholder="Dán ID Youtube (ví dụ: dQw4w9WgXcQ)" style="flex:1; padding:10px">
+                <button class="btn-p" @click="autoFetch">Lấy dữ liệu</button>
             </div>
-            <button class="btn-post" style="margin-top:15px" @click="addNewVideo">Đăng bài ngay</button>
+            <div v-if="preview" style="margin-top:15px; display:flex; gap:20px; align-items:center">
+                <img :src="preview.thumb" width="150">
+                <div>
+                    <p><b>{{ preview.title }}</b></p>
+                    <select v-model="selectedCat" style="padding:8px; background:#000; color:#fff">
+                        <option value="short">Video Ngắn</option>
+                        <option value="daily">Cuộc sống</option>
+                    </select>
+                    <button class="btn-p" style="margin-left:10px" @click="confirmPost">Đăng bài</button>
+                </div>
+            </div>
         </div>
 
-        <div class="hero-section">
-            <div class="main-player">
-                <div class="video-box">
-                    <iframe :src="'https://www.youtube.com/embed/' + currentId" allowfullscreen></iframe>
+        <div class="hero">
+            <div class="player-main">
+                <div class="video-ratio">
+                    <iframe :src="'https://www.youtube.com/embed/' + current.id" allowfullscreen></iframe>
                 </div>
-                <div style="padding:15px">
-                    <h2 style="margin:0">{{ currentTitle }}</h2>
-                    <p style="color:gray">Đang xem nội dung được chọn</p>
-                </div>
-            </div>
+                <div style="padding:20px">
+                    <h2>{{ current.title }}</h2>
+                    <p style="color:#aaa; font-size:14px">{{ current.desc }}</p>
 
-            <div class="sidebar-list">
-                <h3 style="margin-top:0">Video tiếp theo</h3>
-                <div v-for="v in allVideos.slice(0, 8)" class="side-item" @click="playVideo(v)">
-                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <div>
-                        <h4>{{ v.title }}</h4>
-                        <span style="font-size:12px; color:gray">Vừa đăng tải</span>
+                    <div class="comment-section">
+                        <h3 style="margin-top:0">Đánh giá & Bình luận</h3>
+                        
+                        <div v-if="currentUser">
+                            <div class="star-rating">
+                                <span v-for="s in 5" @click="userRating = s" :style="{color: s <= userRating ? 'var(--gold)' : '#333'}">★</span>
+                            </div>
+                            <textarea class="comment-input" v-model="userComment" placeholder="Chia sẻ cảm nghĩ của bạn..."></textarea>
+                            <button class="btn-p" style="margin-top:10px" @click="postComment">Gửi bình luận</button>
+                        </div>
+                        <div v-else style="background:#222; padding:15px; border-radius:8px; text-align:center">
+                            Bạn cần <a href="#" @click="showAuth = 'login'" style="color:var(--primary)">đăng nhập</a> để bình luận và đánh giá.
+                        </div>
+
+                        <div class="comment-list">
+                            <div v-for="c in currentComments" class="comment-item">
+                                <div class="user-tag">{{ c.userName }} <span style="color:var(--gold); margin-left:10px">{{ '★'.repeat(c.rating) }}</span></div>
+                                <div style="font-size:14px; margin-top:5px; color:#ccc">{{ c.text }}</div>
+                                <div style="font-size:10px; color:#555; margin-top:5px">{{ c.time }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div v-for="cat in categories" :key="cat.slug" class="playlist-row">
-            <div class="playlist-title">{{ cat.name }}</div>
-            <div class="video-grid">
-                <div v-for="v in getVideosByCategory(cat.slug)" class="grid-item" @click="playVideo(v)">
-                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <p>{{ v.title }}</p>
+            <div class="sidebar">
+                <h3 style="margin-top:0">Đang được quan tâm</h3>
+                <div v-for="v in allVideos" class="side-card" @click="play(v)">
+                    <img :src="v.thumb">
+                    <div>
+                        <h4 style="margin:0; font-size:14px">{{ v.title }}</h4>
+                        <span style="font-size:11px; color:var(--primary)">{{ v.catName }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,54 +143,103 @@
 </div>
 
 <script>
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted, computed } = Vue;
+const API_KEY = "AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM"; 
 
 createApp({
     setup() {
-        const isAdmin = ref(false);
-        const currentId = ref("dQw4w9WgXcQ");
-        const currentTitle = ref("Bản tin chào mừng");
-        const newVideo = ref({ title: '', id: '', category: 'short' });
+        const showAuth = ref(null);
+        const currentUser = ref(null);
+        const showAdmin = ref(false);
+        const authForm = ref({ user: '', pass: '' });
 
-        const categories = [
-            { name: "Video Ngắn", slug: "short" },
-            { name: "Cuộc sống thường ngày", slug: "daily" },
-            { name: "Ẩm thực làng quê", slug: "food" },
-            { name: "Góc khám phá", slug: "explore" }
-        ];
+        const tempId = ref("");
+        const preview = ref(null);
+        const selectedCat = ref("short");
+        const current = ref({ id: 'dQw4w9WgXcQ', title: 'Video Chào Mừng', desc: 'Đăng nhập để bình luận' });
 
-        const allVideos = ref([
-            { id: "jNQXAC9IVRw", title: "Video Ngắn 01", category: "short" },
-            { id: "9bZkp7q19f0", title: "Cơm quê ngày mưa", category: "food" },
-            { id: "2Vv-BfVoq4g", title: "Khám phá rừng già", category: "explore" },
-            { id: "kJQP7kiw5Fk", title: "Một ngày làm vườn", category: "daily" }
-        ]);
+        const userRating = ref(5);
+        const userComment = ref("");
+        const allVideos = ref([]);
+        const allComments = ref([]);
 
         onMounted(() => {
-            const saved = localStorage.getItem('myVideos');
-            if(saved) allVideos.value = JSON.parse(saved);
+            const vData = localStorage.getItem('gemini_video_store');
+            const cData = localStorage.getItem('gemini_comments');
+            const uData = localStorage.getItem('gemini_current_user');
+            if(vData) allVideos.value = JSON.parse(vData);
+            if(cData) allComments.value = JSON.parse(cData);
+            if(uData) currentUser.value = JSON.parse(uData);
+            if(allVideos.value.length > 0) current.value = allVideos.value[0];
         });
 
-        const addNewVideo = () => {
-            if(!newVideo.value.title || !newVideo.value.id) return alert("Vui lòng nhập đủ thông tin!");
-            // Thêm vào đầu danh sách (mới nhất)
-            allVideos.value.unshift({...newVideo.value});
-            localStorage.setItem('myVideos', JSON.stringify(allVideos.value));
-            newVideo.value = { title: '', id: '', category: 'short' };
-            alert("Đăng bài thành công!");
+        // HỆ THỐNG TÀI KHOẢN (Giả lập)
+        const handleAuth = () => {
+            if(!authForm.value.user || !authForm.value.pass) return alert("Vui lòng nhập đủ!");
+            
+            if(showAuth.value === 'reg') {
+                const users = JSON.parse(localStorage.getItem('gemini_users') || '[]');
+                users.push({ ...authForm.value, role: authForm.value.user === 'admin' ? 'admin' : 'user' });
+                localStorage.setItem('gemini_users', JSON.stringify(users));
+                alert("Đăng ký thành công!");
+                showAuth.value = 'login';
+            } else {
+                const users = JSON.parse(localStorage.getItem('gemini_users') || '[]');
+                const user = users.find(u => u.user === authForm.value.user && u.pass === authForm.value.pass);
+                if(user) {
+                    currentUser.value = { name: user.user, role: user.role };
+                    localStorage.setItem('gemini_current_user', JSON.stringify(currentUser.value));
+                    showAuth.value = null;
+                } else alert("Sai tài khoản!");
+            }
         };
 
-        const getVideosByCategory = (slug) => {
-            return allVideos.value.filter(v => v.category === slug).slice(0, 5);
+        const logout = () => {
+            currentUser.value = null;
+            localStorage.removeItem('gemini_current_user');
+            showAdmin.value = false;
         };
 
-        const playVideo = (v) => {
-            currentId.value = v.id;
-            currentTitle.value = v.title;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // BÌNH LUẬN
+        const postComment = () => {
+            if(!userComment.value) return;
+            const comment = {
+                videoId: current.value.id,
+                userName: currentUser.value.name,
+                rating: userRating.value,
+                text: userComment.value,
+                time: new Date().toLocaleString()
+            };
+            allComments.value.unshift(comment);
+            localStorage.setItem('gemini_comments', JSON.stringify(allComments.value));
+            userComment.value = "";
         };
 
-        return { isAdmin, currentId, currentTitle, newVideo, categories, allVideos, addNewVideo, getVideosByCategory, playVideo };
+        const currentComments = computed(() => {
+            return allComments.value.filter(c => c.videoId === current.value.id);
+        });
+
+        // ADMIN FUNCTIONS (Lấy từ bản trước)
+        const autoFetch = async () => {
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${tempId.value}&key=${API_KEY}`);
+                const json = await res.json();
+                if(json.items.length > 0) {
+                    const snip = json.items[0].snippet;
+                    preview.value = { id: tempId.value, title: snip.title, desc: snip.description, thumb: snip.thumbnails.medium.url };
+                }
+            } catch (e) { alert("Lỗi API"); }
+        };
+
+        const confirmPost = () => {
+            allVideos.value.unshift({ ...preview.value, cat: selectedCat.value, catName: selectedCat.value });
+            localStorage.setItem('gemini_video_store', JSON.stringify(allVideos.value));
+            preview.value = null; tempId.value = "";
+        };
+
+        const play = (v) => { current.value = v; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+
+        return { showAuth, currentUser, showAdmin, authForm, tempId, preview, selectedCat, current, userRating, userComment, allVideos, handleAuth, logout, postComment, currentComments, autoFetch, confirmPost, play };
     }
 }).mount('#app');
 </script>
