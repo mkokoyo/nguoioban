@@ -5,215 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Người Ở Bản - Kết nối yêu thương</title>
     
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #ff4757; --bg: #ffffff; --dark: #121212; }
+        :root { --primary: #ff4757; --bg: #ffffff; }
+        [v-cloak] { display: none !important; }
         
-        /* Chống hiển thị dấu {{ }} khi đang tải */
-        [v-cloak] { display: none; }
-        
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; }
-        header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(22px, 5vw, 35px); letter-spacing: 5px; text-transform: uppercase; cursor: pointer; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; line-height: 1.6; }
+        header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(20px, 5vw, 32px); letter-spacing: 4px; text-transform: uppercase; cursor: pointer; }
         .logo span { color: var(--primary); }
         
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1260px; margin: 0 auto; padding: 0 15px; }
 
-        .main-player-area { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin: 30px 0; }
-        .video-box-container { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
-        .video-box-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* Main Player Section */
+        .player-grid { display: grid; grid-template-columns: 1fr 350px; gap: 25px; margin: 25px 0; }
+        .video-main { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 16px; overflow: hidden; }
+        .video-main iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .video-info { margin-top: 20px; }
-        .video-stats { display: flex; align-items: center; gap: 20px; margin: 15px 0; color: #666; font-size: 14px; }
-        .vote-btn { cursor: pointer; border: 1px solid #ddd; padding: 8px 20px; border-radius: 25px; background: #fff; transition: 0.3s; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .vote-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .video-detail h1 { font-size: 22px; margin: 15px 0 10px; font-weight: 800; color: #000; }
+        .stats-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 14px; }
+        .btn-like { cursor: pointer; border: 1.5px solid #ddd; padding: 8px 18px; border-radius: 30px; background: #fff; font-weight: bold; transition: 0.2s; }
+        .btn-like.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        .sidebar { background: #f9f9f9; border-radius: 20px; padding: 25px; border: 1px solid #eee; height: fit-content; }
-        .side-item { display:flex; gap:15px; margin-bottom:15px; cursor:pointer; align-items: flex-start; transition: 0.3s; padding: 10px; border-radius: 12px; }
-        .side-item:hover { background: #fff; transform: translateX(5px); }
-        .side-item img { border-radius:8px; width: 110px; flex-shrink: 0; aspect-ratio: 16/9; object-fit: cover; }
-        .side-title { font-size: 13px; font-weight: 700; line-height: 1.5; color: #222; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        /* Sidebar */
+        .sidebar { background: #fcfcfc; border-radius: 16px; padding: 20px; border: 1px solid #eee; }
+        .side-card { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; }
+        .side-card img { width: 110px; height: 62px; border-radius: 8px; object-fit: cover; }
+        .side-card .title { font-size: 13px; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Chuyên mục màu sắc */
-        .cat-video-ngắn { --cat-color: #ff4757; --cat-bg: #fff5f6; }
-        .cat-cuộc-sống-thường-ngày { --cat-color: #2ed573; --cat-bg: #f0fff4; }
-        .cat-ẩm-thực-làng-quê { --cat-color: #ffa502; --cat-bg: #fffaf0; }
-        .cat-góc-khám-phá { --cat-color: #1e90ff; --cat-bg: #f0f7ff; }
+        /* Categories with Colors */
+        .cat-box { margin-top: 40px; }
+        .cat-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; }
+        .cat-name { font-weight: 900; text-transform: uppercase; margin: 0; font-size: 18px; }
 
-        .category-section { background: var(--cat-bg); border-top: 2px solid var(--cat-color); margin: 50px 0 25px; padding: 20px 0; }
-        .cat-header { display: flex; justify-content: space-between; align-items: center; }
-        .cat-title-box { display: flex; align-items: center; gap: 12px; }
-        .cat-vạch { width: 8px; height: 35px; background: var(--cat-color); border-radius: 4px; }
-        .cat-name { font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 0; }
+        /* Styles cho từng loại chuyên mục */
+        .cat-video-ngắn { background: #fff5f6; border-left: 6px solid #ff4757; color: #ff4757; }
+        .cat-cuộc-sống-thường-ngày { background: #f0fff4; border-left: 6px solid #2ed573; color: #2ed573; }
+        .cat-ẩm-thực-làng-quê { background: #fffaf0; border-left: 6px solid #ffa502; color: #ffa502; }
+        .cat-góc-khám-phá { background: #f0f7ff; border-left: 6px solid #1e90ff; color: #1e90ff; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 20px; }
-        .v-card { cursor: pointer; transition: 0.3s; }
-        .v-card img { width: 100%; border-radius: 15px; border: 2px solid transparent; transition: 0.3s; margin-bottom: 12px; aspect-ratio: 16/9; object-fit: cover; }
-        .v-card:hover img { border-color: var(--cat-color); transform: translateY(-5px); }
-        
-        /* Hiển thị tiêu đề đầy đủ */
-        .v-card h4 { font-size: 14px; margin: 0; font-weight: 700; line-height: 1.5; min-height: 42px; max-height: 63px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; color: #1a1a1a; }
-        
-        .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--cat-color); background: #fff; color: var(--cat-color); cursor: pointer; font-weight: bold; }
-        .nav-btn:disabled { opacity: 0.2; }
+        /* Grid Video */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .v-item { cursor: pointer; }
+        .v-item img { width: 100%; aspect-ratio: 16/9; border-radius: 12px; object-fit: cover; transition: 0.3s; }
+        .v-item:hover img { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .v-item h4 { 
+            margin: 10px 0 5px; font-size: 14px; font-weight: 700; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; 
+            overflow: hidden; min-height: 40px; 
+        }
+        .v-info { font-size: 12px; color: #888; }
 
-        footer { background: var(--dark); color: #fff; padding: 50px 0; text-align: center; margin-top: 80px; position: relative; }
-        footer::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #ff4757, #2ed573, #ffa502, #1e90ff); }
-
-        @media (max-width: 1100px) { :root { --cols: 3; } .main-player-area { grid-template-columns: 1fr; } }
-        @media (max-width: 700px) { :root { --cols: 2; } }
+        @media (max-width: 992px) { .player-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div id="app" v-cloak>
     <header>
-        <div class="logo" @click="promptAdmin">NGƯỜI Ở <span>BẢN</span></div>
+        <div class="logo" @click="adminLogin">NGƯỜI Ở <span>BẢN</span></div>
     </header>
 
-    <div class="container">
-        <div v-if="isAdmin" style="background:#fff5f6; padding:20px; border-radius:15px; border:2px dashed var(--primary); margin: 20px 0; display:flex; gap:10px; align-items:center;">
-            <input v-model="newId" placeholder="Mã YouTube ID" style="padding:10px; flex:1; border-radius:8px; border:1px solid #ddd;">
-            <select v-model="newCat" style="padding:10px; border-radius:8px;">
-                <option v-for="c in categories" :value="c">{{c}}</option>
+    <div class="container" v-if="videos.length > 0">
+        <div v-if="isAdm" style="margin:20px 0; padding:20px; border:2px dashed red; border-radius:15px;">
+            <input v-model="newId" placeholder="Mã ID Youtube (ví dụ: aAbB123)" style="padding:10px; width:200px;">
+            <select v-model="newC" style="padding:10px;">
+                <option v-for="c in cats" :value="c">{{c}}</option>
             </select>
-            <button @click="addVideo" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">THÊM</button>
-            <button @click="isAdmin=false" style="padding:10px; background:none; border:none; color:gray; cursor:pointer;">Đóng</button>
+            <button @click="saveVid" style="padding:10px 20px; background:red; color:white; border:none; cursor:pointer;">LƯU VIDEO</button>
         </div>
 
-        <div class="main-player-area" v-if="current && current.id">
-            <div class="player-left">
-                <div class="video-box-container">
-                    <iframe :key="current.id" 
-                            :src="'https://www.youtube.com/embed/' + current.id + '?autoplay=1&rel=0&modestbranding=1'" 
-                            allow="autoplay; fullscreen"></iframe>
+        <div class="player-grid" v-if="cur">
+            <div class="main-col">
+                <div class="video-main">
+                    <iframe :key="cur.id" :src="'https://www.youtube.com/embed/' + cur.id + '?autoplay=1&rel=0'" allowfullscreen allow="autoplay"></iframe>
                 </div>
-                <div class="video-info">
-                    <h2 style="font-weight: 900; font-size: 24px; margin: 0; line-height: 1.4;">{{ current.title }}</h2>
-                    <div class="video-stats">
-                        <span>👁️ {{ current.views || 0 }} lượt xem</span>
-                        <button class="vote-btn" :class="{active: hasVoted}" @click="vote">
-                            ❤️ {{ current.likes || 0 }} Thích
-                        </button>
+                <div class="video-detail">
+                    <h1>{{ cur.title }}</h1>
+                    <div class="stats-row">
+                        <span>👁️ {{ cur.views || 0 }} lượt xem</span>
+                        <button class="btn-like" :class="{active: liked}" @click="doLike">❤️ {{ cur.likes || 0 }} Thích</button>
                     </div>
                 </div>
             </div>
             
             <div class="sidebar">
-                <p style="font-weight:900; color:var(--primary); font-size:13px; margin-bottom:15px; text-transform: uppercase; letter-spacing: 1px;">XEM TIẾP</p>
-                <div v-for="v in randomList" :key="v.key" @click="changeVideo(v)" class="side-item">
+                <h3 style="margin:0 0 15px; font-size:14px; color:var(--primary)">XEM TIẾP</h3>
+                <div v-for="v in suggest" :key="v.key" class="side-card" @click="play(v)">
                     <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                    <div class="side-title">{{ v.title }}</div>
+                    <div class="title">{{ v.title }}</div>
                 </div>
             </div>
         </div>
 
-        <div v-for="cat in categories" :key="cat" :class="'cat-' + cat.toLowerCase().replace(/ /g, '-')">
-            <div v-if="getVidsByCat(cat).length > 0">
-                <div class="category-section">
-                    <div class="container">
-                        <div class="cat-header">
-                            <div class="cat-title-box">
-                                <div class="cat-vạch"></div>
-                                <h3 class="cat-name">{{ cat }}</h3>
-                            </div>
-                            <div v-if="getVidsByCat(cat).length > itemsPerPage">
-                                <button class="nav-btn" @click="pageMap[cat]--" :disabled="pageMap[cat] === 0">❮</button>
-                                <button class="nav-btn" @click="pageMap[cat]++" :disabled="isLastPage(cat)" style="margin-left:8px;">❯</button>
-                            </div>
-                        </div>
-                    </div>
+        <div v-for="cat in cats" :key="cat" class="cat-box">
+            <div v-if="filter(cat).length > 0">
+                <div class="cat-header" :class="'cat-' + cat.toLowerCase().replace(/ /g, '-')">
+                    <h3 class="cat-name">{{ cat }}</h3>
                 </div>
-                <div class="container">
-                    <div class="video-grid">
-                        <div v-for="v in getPagedVids(cat)" :key="v.key" class="v-card" @click="changeVideo(v)">
-                            <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
-                            <h4>{{ v.title }}</h4>
-                            <div style="font-size:12px; color:#888; margin-top:8px;">👁️ {{ v.views || 0 }} • ❤️ {{ v.likes || 0 }}</div>
-                            <button v-if="isAdmin" @click.stop="deleteVid(v.key)" style="color:red; border:none; background:none; cursor:pointer; font-size:11px; margin-top:10px; font-weight:bold;">[XÓA]</button>
-                        </div>
+                <div class="grid">
+                    <div v-for="v in filter(cat)" :key="v.key" class="v-item" @click="play(v)">
+                        <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                        <h4>{{ v.title }}</h4>
+                        <div class="v-info">👁️ {{ v.views }} • ❤️ {{ v.likes }}</div>
+                        <button v-if="isAdm" @click.stop="delVid(v.key)" style="color:red; margin-top:5px; border:none; background:none; cursor:pointer;">[Xóa]</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <div v-else style="text-align:center; padding:100px; font-weight:bold; color:#888;">
+        Đang tải dữ liệu bản làng...
+    </div>
 
-    <footer>
-        <div class="logo">NGƯỜI Ở <span>BẢN</span></div>
-        <p style="color:#666; font-size:12px; margin-top:15px; letter-spacing:2px;">GÌN GIỮ BẢN SẮC VIỆT &copy; 2025</p>
-    </footer>
+    <footer style="padding:60px; text-align:center; color:#ccc;">&copy; 2025 NGƯỜI Ở BẢN</footer>
 </div>
 
 <script>
-// Khởi tạo Firebase
-const fbConfig = {
+// Cấu hình Firebase
+const config = {
     apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
     authDomain: "nguoioban-77943.firebaseapp.com",
     databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/",
     projectId: "nguoioban-77943",
     appId: "1:96090638378:web:84c6d4c9ae26a87869db53"
 };
-firebase.initializeApp(fbConfig);
-const db = firebase.database();
-const { createApp, ref, onMounted, computed } = Vue;
 
-createApp({
-    setup() {
-        const videos = ref([]);
-        const current = ref(null);
-        const categories = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
-        const pageMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
-        const itemsPerPage = ref(5);
-        const userIP = ref('');
-        const isAdmin = ref(false);
-        const newId = ref('');
-        const newCat = ref('Video ngắn');
+// Đảm bảo mọi thứ chạy sau khi DOM sẵn sàng
+document.addEventListener('DOMContentLoaded', function() {
+    firebase.initializeApp(config);
+    const db = firebase.database();
+    const { createApp, ref, onMounted, computed } = Vue;
 
-        const fetchIP = async () => {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                userIP.value = data.ip.replace(/\./g, '_');
-            } catch(e) { userIP.value = 'unknown'; }
-        };
+    createApp({
+        setup() {
+            const videos = ref([]);
+            const cur = ref(null);
+            const cats = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
+            const isAdm = ref(false);
+            const newId = ref('');
+            const newC = ref('Video ngắn');
+            const myIp = ref('');
 
-        const changeVideo = (v) => {
-            current.value = v;
-            db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1);
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        };
+            onMounted(async () => {
+                // Lấy IP
+                try {
+                    const r = await fetch('https://api.ipify.org?format=json');
+                    const d = await r.json();
+                    myIp.value = d.ip.replace(/\./g, '_');
+                } catch(e) { myIp.value = 'guest'; }
 
-        const vote = () => {
-            if(!current.value || hasVoted.value) return;
-            db.ref(`videos/${current.value.key}/likes`).transaction(l => (l || 0) + 1);
-            db.ref(`videos/${current.value.key}/voters/${userIP.value}`).set(true);
-        };
+                // Lấy data từ Firebase
+                db.ref('videos').on('value', snap => {
+                    const val = snap.val();
+                    if(val) {
+                        const arr = Object.keys(val).map(k => ({key: k, ...val[k]})).reverse();
+                        videos.value = arr;
+                        if(!cur.value) cur.value = arr[0];
+                        // Cập nhật lại cur nếu có thay đổi (like/view)
+                        if(cur.value) {
+                            const found = arr.find(x => x.key === cur.value.key);
+                            if(found) cur.value = found;
+                        }
+                    }
+                });
+            });
 
-        const hasVoted = computed(() => {
-            return current.value && current.value.voters && current.value.voters[userIP.value];
-        });
+            const play = (v) => {
+                cur.value = v;
+                db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1);
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            };
 
-        const randomList = computed(() => {
-            if (!current.value) return [];
-            return videos.value.filter(v => v.id !== current.value.id).sort(() => 0.5 - Math.random()).slice(0, 5);
-        });
+            const doLike = () => {
+                if(!cur.value || liked.value) return;
+                db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1);
+                db.ref(`videos/${cur.value.key}/voters/${myIp.value}`).set(true);
+            };
 
-        const getVidsByCat = (cat) => videos.value.filter(v => v.category === cat);
-        const getPagedVids = (cat) => getVidsByCat(cat).slice(pageMap.value[cat]*itemsPerPage.value, (pageMap.value[cat]+1)*itemsPerPage.value);
-        const isLastPage = (cat) => (pageMap.value[cat]+1)*itemsPerPage.value >= getVidsByCat(cat).length;
+            const liked = computed(() => {
+                return cur.value && cur.value.voters && cur.value.voters[myIp.value];
+            });
 
-        const promptAdmin = () => {
-            const p = prompt("Nhập mã bảo mật:");
-            if(p === 'cong1997') isAdmin.value = true;
-        };
+            const suggest = computed(() => {
+                return videos.value.filter(x => x.id !== cur.value?.id).sort(() => 0.5 - Math.random()).slice(0, 5);
+            });
 
-        const addVideo = async () => {
-            if(!newId.value) return;
-            try {
+            const filter = (c) => videos.value.filter(x => x.category === c);
+
+            const adminLogin = () => {
+                if(prompt("Mật khẩu:") === 'cong1997') isAdm.value = true;
+            };
+
+            const saveVid = async () => {
+                if(!newId.value) return;
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
                 const data = await res.json();
-                if(data
+                if(data.items && data.items[0]) {
+                    db.ref('videos').push({
+                        id: newId.value,
+                        title: data.items[0].snippet.title,
+                        category: newC.value,
+                        views: 0, likes: 0
+                    });
+                    newId.value = ''; alert("Xong!");
+                }
+            };
+
+            const delVid = (k) => { if(confirm("Xóa?")) db.ref('videos/'+k).remove(); };
+
+            return { videos, cur, cats, isAdm, newId, newC, saveVid, delVid, play, doLike, liked, suggest, filter, adminLogin };
+        }
+    }).mount('#app');
+});
+</script>
+</body>
+</html>
