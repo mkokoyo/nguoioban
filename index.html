@@ -3,94 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Hub Premium</title>
+    <title>My Video Universe</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        :root {
-            --bg: #0a0a0a; --card: #161616; --primary: #ff0000; --text: #fff;
-        }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        :root { --bg: #050505; --card: #121212; --primary: #ff4757; --text: #eee; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); }
         
-        /* Navigation */
-        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 800; font-size: 24px; color: var(--primary); }
-        .admin-btn { background: #333; color: #fff; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #222; position: sticky; top:0; z-index:100; }
+        .logo { font-weight: 900; font-size: 26px; color: var(--primary); text-transform: uppercase; }
+        .admin-btn { background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .container { max-width: 1300px; margin: 20px auto; padding: 0 20px; }
 
-        /* Row 1: Feature Video & Sidebar */
-        .hero-section { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 40px; }
-        .main-player { background: var(--card); border-radius: 15px; overflow: hidden; }
+        /* Tỉ lệ mới: Player nhỏ hơn, Sidebar lớn hơn */
+        .hero-section { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 50px; }
+        .main-player { background: var(--card); border-radius: 12px; overflow: hidden; height: fit-content; }
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
         .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
         
-        .sidebar-list { display: flex; flex-direction: column; gap: 15px; }
-        .side-item { display: flex; gap: 10px; cursor: pointer; border-radius: 8px; transition: 0.3s; padding: 5px; }
-        .side-item:hover { background: #222; }
-        .side-item img { width: 120px; border-radius: 8px; }
-        .side-item h4 { margin: 0; font-size: 14px; line-height: 1.2; }
+        .sidebar-list { background: var(--card); padding: 15px; border-radius: 12px; height: 450px; overflow-y: auto; }
+        .side-item { display: flex; gap: 15px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+        .side-item:hover { background: #222; border-radius: 8px; }
+        .side-item img { width: 160px; height: 90px; border-radius: 8px; object-fit: cover; }
+        .side-item div h4 { margin: 0; font-size: 15px; color: #fff; }
 
-        /* Playlist Sections */
+        /* Playlists */
         .playlist-row { margin-bottom: 40px; }
-        .playlist-title { font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); padding-left: 15px; }
+        .playlist-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; border-left: 5px solid var(--primary); padding-left: 15px; color: var(--primary); }
         .video-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-        .grid-item { cursor: pointer; transition: 0.3s; }
-        .grid-item:hover { transform: translateY(-5px); }
-        .grid-item img { width: 100%; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; }
-        .grid-item p { font-size: 13px; margin: 8px 0; font-weight: 500; }
+        .grid-item { cursor: pointer; transition: 0.3s; text-align: center; }
+        .grid-item img { width: 100%; border-radius: 8px; aspect-ratio: 16/9; }
+        .grid-item p { font-size: 13px; margin: 5px 0; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Admin Panel */
-        .admin-panel { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid var(--primary); margin: 20px 0; }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; }
+        /* Admin Dashboard */
+        .admin-modal { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 30px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        input, select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 5px; }
+        .btn-post { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-        @media (max-width: 1000px) {
-            .hero-section { grid-template-columns: 1fr; }
-            .video-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        @media (max-width: 900px) { .hero-section { grid-template-columns: 1fr; } .video-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
 
 <div id="app">
     <nav>
-        <div class="logo">GEMINI<span style="color:#fff">TV</span></div>
-        <button class="admin-btn" @click="toggleAdmin">{{ isAdmin ? 'Thoát Admin' : 'Quản trị' }}</button>
+        <div class="logo">GEMINI STUDIO</div>
+        <button class="admin-btn" @click="isAdmin = !isAdmin">🔧 Quản lý hệ thống</button>
     </nav>
 
     <div class="container">
-        <div v-if="isAdmin" class="admin-panel">
-            <h3>⚙️ Quản lý nội dung</h3>
-            <label>ID Video chính (Bên trái):</label>
-            <input v-model="mainId">
-            <button @click="saveData" style="background:var(--primary); color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Lưu thay đổi</button>
+        <div v-if="isAdmin" class="admin-modal">
+            <h3 style="margin:0">➕ Đăng Video Mới</h3>
+            <div class="form-row">
+                <input v-model="newVideo.title" placeholder="Tiêu đề video...">
+                <input v-model="newVideo.id" placeholder="ID YouTube (vd: dQw4w9WgXcQ)">
+                <select v-model="newVideo.category">
+                    <option value="short">Video Ngắn</option>
+                    <option value="daily">Cuộc sống thường ngày</option>
+                    <option value="food">Ẩm thực làng quê</option>
+                    <option value="explore">Góc khám phá</option>
+                </select>
+            </div>
+            <button class="btn-post" style="margin-top:15px" @click="addNewVideo">Đăng bài ngay</button>
         </div>
 
         <div class="hero-section">
             <div class="main-player">
                 <div class="video-box">
-                    <iframe :src="'https://www.youtube.com/embed/' + mainId" allowfullscreen></iframe>
+                    <iframe :src="'https://www.youtube.com/embed/' + currentId" allowfullscreen></iframe>
                 </div>
-                <div style="padding: 15px;">
-                    <h2 style="margin:0">Video Nổi Bật Hôm Nay</h2>
-                    <p style="color:#aaa; font-size:14px;">Tự động cập nhật từ hệ thống quản trị của bạn.</p>
+                <div style="padding:15px">
+                    <h2 style="margin:0">{{ currentTitle }}</h2>
+                    <p style="color:gray">Đang xem nội dung được chọn</p>
                 </div>
             </div>
 
             <div class="sidebar-list">
-                <h3 style="margin-top:0">Gợi ý cho bạn</h3>
-                <div v-for="i in 4" class="side-item" @click="changeMain(sideVideos[i-1])">
-                    <img :src="'https://img.youtube.com/vi/'+sideVideos[i-1]+'/mqdefault.jpg'">
-                    <h4>Video gợi ý đặc sắc số {{i}}</h4>
+                <h3 style="margin-top:0">Video tiếp theo</h3>
+                <div v-for="v in allVideos.slice(0, 8)" class="side-item" @click="playVideo(v)">
+                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                    <div>
+                        <h4>{{ v.title }}</h4>
+                        <span style="font-size:12px; color:gray">Vừa đăng tải</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div v-for="(playlist, index) in playlists" :key="index" class="playlist-row">
-            <div class="playlist-title">{{ playlist.name }}</div>
+        <div v-for="cat in categories" :key="cat.slug" class="playlist-row">
+            <div class="playlist-title">{{ cat.name }}</div>
             <div class="video-grid">
-                <div v-for="vID in playlist.videos" class="grid-item" @click="changeMain(vID)">
-                    <img :src="'https://img.youtube.com/vi/'+vID+'/mqdefault.jpg'">
-                    <p>Khám phá nội dung mới nhất #{{vID.slice(0,3)}}</p>
+                <div v-for="v in getVideosByCategory(cat.slug)" class="grid-item" @click="playVideo(v)">
+                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                    <p>{{ v.title }}</p>
                 </div>
             </div>
         </div>
@@ -103,38 +109,49 @@ const { createApp, ref, onMounted } = Vue;
 createApp({
     setup() {
         const isAdmin = ref(false);
-        const mainId = ref("dQw4w9WgXcQ");
-        const sideVideos = ["jNQXAC9IVRw", "9bZkp7q19f0", "2Vv-BfVoq4g", "kJQP7kiw5Fk"];
+        const currentId = ref("dQw4w9WgXcQ");
+        const currentTitle = ref("Bản tin chào mừng");
+        const newVideo = ref({ title: '', id: '', category: 'short' });
 
-        // Dữ liệu 3 danh sách phát, mỗi danh sách 5 video
-        const playlists = ref([
-            { name: "🎬 Phim Ngắn Mới Xuất Bản", videos: ["ScMzIvxBSi4", "OPf0YbXqDm0", "L_jWHff96Tw", "3JZ_D3ELwOQ", "VbfpWjIqOHw"] },
-            { name: "🎵 Âm Nhạc Thịnh Hành", videos: ["9bZkp7q19f0", "hT_nvWreIhg", "JGwWNGJdvx8", "CevxZvSJLk8", "YQHsXMglC9A"] },
-            { name: "🌏 Khám Phá Thế Giới", videos: ["ScMzIvxBSi4", "OPf0YbXqDm0", "L_jWHff96Tw", "3JZ_D3ELwOQ", "VbfpWjIqOHw"] }
+        const categories = [
+            { name: "Video Ngắn", slug: "short" },
+            { name: "Cuộc sống thường ngày", slug: "daily" },
+            { name: "Ẩm thực làng quê", slug: "food" },
+            { name: "Góc khám phá", slug: "explore" }
+        ];
+
+        const allVideos = ref([
+            { id: "jNQXAC9IVRw", title: "Video Ngắn 01", category: "short" },
+            { id: "9bZkp7q19f0", title: "Cơm quê ngày mưa", category: "food" },
+            { id: "2Vv-BfVoq4g", title: "Khám phá rừng già", category: "explore" },
+            { id: "kJQP7kiw5Fk", title: "Một ngày làm vườn", category: "daily" }
         ]);
 
         onMounted(() => {
-            const savedMain = localStorage.getItem('mainId');
-            if(savedMain) mainId.value = savedMain;
+            const saved = localStorage.getItem('myVideos');
+            if(saved) allVideos.value = JSON.parse(saved);
         });
 
-        const toggleAdmin = () => {
-            if(!isAdmin.value) {
-                if(prompt("Mật khẩu:") === "123") isAdmin.value = true;
-            } else isAdmin.value = false;
+        const addNewVideo = () => {
+            if(!newVideo.value.title || !newVideo.value.id) return alert("Vui lòng nhập đủ thông tin!");
+            // Thêm vào đầu danh sách (mới nhất)
+            allVideos.value.unshift({...newVideo.value});
+            localStorage.setItem('myVideos', JSON.stringify(allVideos.value));
+            newVideo.value = { title: '', id: '', category: 'short' };
+            alert("Đăng bài thành công!");
         };
 
-        const saveData = () => {
-            localStorage.setItem('mainId', mainId.value);
-            alert("Đã lưu!");
+        const getVideosByCategory = (slug) => {
+            return allVideos.value.filter(v => v.category === slug).slice(0, 5);
         };
 
-        const changeMain = (id) => {
-            mainId.value = id;
+        const playVideo = (v) => {
+            currentId.value = v.id;
+            currentTitle.value = v.title;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        return { isAdmin, mainId, sideVideos, playlists, toggleAdmin, saveData, changeMain };
+        return { isAdmin, currentId, currentTitle, newVideo, categories, allVideos, addNewVideo, getVideosByCategory, playVideo };
     }
 }).mount('#app');
 </script>
