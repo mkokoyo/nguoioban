@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Ở Bản - Bản Fix Cuối Cùng</title>
+    <title>Người Ở Bản - Bản Fix Lỗi Đăng Nhập</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -13,88 +13,95 @@
     <style>
         :root { --primary: #ff4757; --bg: #ffffff; }
         [v-cloak] { display: none !important; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; }
         
-        header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        /* Giao diện chính */
+        header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: 4px; text-transform: uppercase; cursor: pointer; }
         .logo span { color: var(--primary); }
-        
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-        /* PLAYER & SIDEBAR */
-        .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; margin: 30px 0; }
-        .video-player { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .video-player iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        
-        .video-title { font-size: 24px; font-weight: 800; margin: 20px 0 10px; line-height: 1.4; }
-        .video-meta { display: flex; align-items: center; gap: 20px; font-size: 14px; color: #666; margin-bottom: 30px; }
-        .like-btn { cursor: pointer; border: 1.5px solid #ddd; padding: 8px 20px; border-radius: 30px; background: #fff; font-weight: bold; transition: 0.3s; }
-        .like-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        /* Đăng nhập Admin (Modal) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .modal-box button { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
-        .sidebar { background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; height: fit-content; }
+        /* Player & Sidebar */
+        .layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; margin: 30px 0; }
+        .v-main { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; }
+        .v-main iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .sidebar { background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; }
         .side-head { font-weight: 900; color: var(--primary); font-size: 13px; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .side-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; border-radius: 10px; padding: 5px; }
+        .side-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; padding: 5px; border-radius: 10px; }
         .side-item:hover { background: #fff; transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .side-item img { width: 110px; height: 62px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .side-item img { width: 110px; height: 62px; border-radius: 8px; object-fit: cover; }
         .side-txt { font-size: 13px; font-weight: 700; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* CATEGORIES & PAGINATION */
+        /* Chuyên mục & Phân trang */
         .cat-video-ngắn { --c: #ff4757; --b: #fff5f6; }
         .cat-cuộc-sống-thường-ngày { --c: #2ed573; --b: #f0fff4; }
         .cat-ẩm-thực-làng-quê { --c: #ffa502; --b: #fffaf0; }
         .cat-góc-khám-phá { --c: #1e90ff; --b: #f0f7ff; }
 
-        .cat-header { background: var(--b); border-left: 6px solid var(--c); padding: 15px 20px; margin: 50px 0 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 10px 10px 0; }
-        .cat-name { font-weight: 900; text-transform: uppercase; color: var(--c); margin: 0; font-size: 18px; }
+        .cat-head { background: var(--b); border-left: 6px solid var(--c); padding: 15px 20px; margin: 50px 0 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 10px 10px 0; }
+        .cat-name { font-weight: 900; text-transform: uppercase; color: var(--c); font-size: 18px; margin: 0; }
+        
+        .grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 20px; }
+        .card { cursor: pointer; transition: 0.3s; }
+        .card img { width: 100%; aspect-ratio: 16/9; border-radius: 15px; object-fit: cover; transition: 0.4s; border: 2px solid transparent; }
+        .card:hover img { transform: translateY(-8px); border-color: var(--c); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .card h4 { margin: 12px 0 5px; font-size: 14px; font-weight: 700; height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr); gap: 20px; }
-        .video-card { cursor: pointer; transition: 0.3s; }
-        .video-card img { width: 100%; aspect-ratio: 16/9; border-radius: 15px; object-fit: cover; transition: 0.4s; border: 2px solid transparent; }
-        .video-card:hover img { transform: translateY(-8px); border-color: var(--c); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .video-card h4 { margin: 12px 0 5px; font-size: 14px; font-weight: 700; line-height: 1.5; height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-
-        .page-nav { display: flex; gap: 8px; }
-        .nav-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--c); background: #fff; color: var(--c); cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .nav-btn:hover:not(:disabled) { background: var(--c); color: #fff; }
+        .nav-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--c); background: #fff; color: var(--c); cursor: pointer; font-weight: bold; }
         .nav-btn:disabled { opacity: 0.2; }
 
-        /* FOOTER */
-        footer { background: #121212; color: #fff; padding: 50px 0; text-align: center; margin-top: 80px; position: relative; }
+        /* Footer */
+        footer { background: #121212; color: #fff; padding: 60px 0; text-align: center; margin-top: 100px; position: relative; }
         footer::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #ff4757, #2ed573, #ffa502, #1e90ff); }
-        .footer-logo span { color: var(--primary); font-family: 'Montserrat'; font-weight: 900; font-size: 24px; letter-spacing: 3px; }
 
-        @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } :root { --cols: 3; } }
+        @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } :root { --cols: 3; } }
         @media (max-width: 600px) { :root { --cols: 2; } }
     </style>
 </head>
 <body>
 
 <div id="app" v-cloak>
+    <div class="modal-overlay" v-if="showLogin">
+        <div class="modal-box">
+            <h3>QUẢN TRỊ VIÊN</h3>
+            <input type="password" v-model="passInput" placeholder="Nhập mã bảo mật..." @keyup.enter="checkPass">
+            <button @click="checkPass">ĐĂNG NHẬP</button>
+            <button @click="showLogin = false" style="background:none; color:gray;">Hủy</button>
+        </div>
+    </div>
+
     <header>
-        <div class="logo" @click="goAdm">NGƯỜI Ở <span>BẢN</span></div>
+        <div class="logo" @click="showLogin = true">NGƯỜI Ở <span>BẢN</span></div>
     </header>
 
     <div class="container" v-if="vids.length > 0">
-        <div v-if="isAdm" style="padding:20px; border:2px dashed red; margin:20px 0; border-radius:15px; background:#fff5f6;">
-            <input v-model="nId" placeholder="YouTube ID" style="padding:10px;">
-            <select v-model="nCat" style="padding:10px;">
+        <div v-if="isAdm" style="padding:25px; border:2px dashed var(--primary); border-radius:20px; background:#fff5f6; margin: 20px 0; display:flex; gap:10px;">
+            <input v-model="newId" placeholder="Mã ID YouTube" style="padding:10px; flex:1; border-radius:10px; border:1px solid #ddd;">
+            <select v-model="newCat" style="padding:10px; border-radius:10px;">
                 <option v-for="c in cats" :value="c">{{c}}</option>
             </select>
-            <button @click="save" style="padding:10px 20px; background:red; color:white; border:none; cursor:pointer;">LƯU</button>
+            <button @click="saveVid" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">THÊM</button>
+            <button @click="isAdm = false" style="background:none; color:gray;">Thoát Admin</button>
         </div>
 
-        <div class="main-layout" v-if="cur">
-            <div class="left-col">
-                <div class="video-player">
+        <div class="layout" v-if="cur">
+            <div>
+                <div class="v-main">
                     <iframe :key="cur.id" :src="'https://www.youtube.com/embed/' + cur.id + '?autoplay=1'" allowfullscreen allow="autoplay"></iframe>
                 </div>
-                <div class="video-title">{{ cur.title }}</div>
-                <div class="video-meta">
-                    <span>👁️ {{ cur.views || 0 }} lượt xem</span>
-                    <button class="like-btn" :class="{active: isLiked}" @click="like">❤️ {{ cur.likes || 0 }} Thích</button>
+                <h2 style="font-size:24px; margin:20px 0 10px;">{{ cur.title }}</h2>
+                <div style="color:#666; font-size:14px; margin-bottom:30px;">
+                    👁️ {{ cur.views || 0 }} lượt xem • 
+                    <button @click="vote" style="cursor:pointer; background:none; border:1px solid #ddd; padding:5px 15px; border-radius:20px;" :style="isLiked ? 'background:red; color:white; border-color:red' : ''">❤️ {{ cur.likes || 0 }} Thích</button>
                 </div>
             </div>
-            
             <div class="sidebar">
                 <div class="side-head">CÓ THỂ BẠN THÍCH</div>
                 <div v-for="v in suggest" :key="v.key" class="side-item" @click="play(v)">
@@ -106,38 +113,33 @@
 
         <div v-for="cat in cats" :key="cat" :class="'cat-' + cat.toLowerCase().replace(/ /g, '-')">
             <div v-if="list(cat).length > 0">
-                <div class="cat-header">
+                <div class="cat-head">
                     <h3 class="cat-name">{{ cat }}</h3>
-                    <div class="page-nav" v-if="list(cat).length > itemsPerPage">
+                    <div v-if="list(cat).length > itemsPerPage">
                         <button class="nav-btn" @click="pMap[cat]--" :disabled="pMap[cat] === 0">❮</button>
-                        <button class="nav-btn" @click="pMap[cat]++" :disabled="isEnd(cat)">❯</button>
+                        <button class="nav-btn" @click="pMap[cat]++" :disabled="isEnd(cat)" style="margin-left:8px;">❯</button>
                     </div>
                 </div>
-                <div class="video-grid">
-                    <div v-for="v in paged(cat)" :key="v.key" class="video-card" @click="play(v)">
+                <div class="grid">
+                    <div v-for="v in paged(cat)" :key="v.key" class="card" @click="play(v)">
                         <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
                         <h4>{{ v.title }}</h4>
                         <div style="font-size:12px; color:#999;">👁️ {{ v.views }} • ❤️ {{ v.likes }}</div>
-                        <button v-if="isAdm" @click.stop="del(v.key)" style="color:red; border:none; background:none; cursor:pointer; font-size:10px;">[XÓA]</button>
+                        <button v-if="isAdm" @click.stop="del(v.key)" style="color:red; background:none; border:none; cursor:pointer; font-size:10px; margin-top:5px;">[XÓA BÀI]</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div v-else style="text-align:center; padding:100px; font-weight:bold; color:#888;">
-        ĐANG TẢI DỮ LIỆU BẢN LÀNG...
-    </div>
-
     <footer>
-        <div class="footer-logo">NGƯỜI Ở <span>BẢN</span></div>
-        <p style="color:#666; font-size:12px; margin-top:15px; letter-spacing:2px;">GÌN GIỮ BẢN SẮC VIỆT &copy; 2025</p>
+        <h2 style="font-family:'Montserrat'; font-weight:900;">NGƯỜI Ở <span style="color:var(--primary)">BẢN</span></h2>
+        <p style="color:#666; font-size:12px; margin-top:15px; letter-spacing:2px;">&copy; 2025 - GÌN GIỮ BẢN SẮC VIỆT</p>
     </footer>
 </div>
 
 <script>
-// Khởi tạo Firebase cực kỳ an toàn
-const config = {
+const fbConfig = {
     apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
     authDomain: "nguoioban-77943.firebaseapp.com",
     databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/",
@@ -146,7 +148,7 @@ const config = {
 };
 
 window.onload = function() {
-    firebase.initializeApp(config);
+    firebase.initializeApp(fbConfig);
     const db = firebase.database();
     const { createApp, ref, onMounted, computed } = Vue;
 
@@ -157,20 +159,30 @@ window.onload = function() {
             const cats = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
             const pMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
             const itemsPerPage = ref(5);
+            
+            // Logic Admin mới
+            const showLogin = ref(false);
+            const passInput = ref('');
             const isAdm = ref(false);
-            const nId = ref('');
-            const nCat = ref('Video ngắn');
-            const uIp = ref('');
+            const checkPass = () => {
+                if(passInput.value === 'cong1997') {
+                    isAdm.value = true; showLogin.value = false; passInput.value = '';
+                } else { alert("Mật mã sai!"); }
+            };
+
+            const newId = ref('');
+            const newCat = ref('Video ngắn');
+            const ip = ref('');
 
             onMounted(async () => {
-                const resize = () => itemsPerPage.value = window.innerWidth > 1000 ? 5 : (window.innerWidth > 600 ? 3 : 2);
-                resize(); window.addEventListener('resize', resize);
+                const resiz = () => itemsPerPage.value = window.innerWidth > 1000 ? 5 : (window.innerWidth > 600 ? 3 : 2);
+                resiz(); window.addEventListener('resize', resiz);
 
                 try {
                     const r = await fetch('https://api.ipify.org?format=json');
                     const d = await r.json();
-                    uIp.value = d.ip.replace(/\./g, '_');
-                } catch(e) { uIp.value = 'guest'; }
+                    ip.value = d.ip.replace(/\./g, '_');
+                } catch(e) { ip.value = 'guest'; }
 
                 db.ref('videos').on('value', s => {
                     const val = s.val();
@@ -187,25 +199,25 @@ window.onload = function() {
             });
 
             const play = (v) => { cur.value = v; db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1); window.scrollTo({top:0, behavior:'smooth'}); };
-            const like = () => { if(!cur.value || isLiked.value) return; db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${cur.value.key}/voters/${uIp.value}`).set(true); };
-            const isLiked = computed(() => cur.value && cur.value.voters && cur.value.voters[uIp.value]);
+            const vote = () => { if(!cur.value || isLiked.value) return; db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${cur.value.key}/voters/${ip.value}`).set(true); };
+            const isLiked = computed(() => cur.value && cur.value.voters && cur.value.voters[ip.value]);
             const suggest = computed(() => vids.value.filter(x => x.id !== cur.value?.id).sort(() => 0.5 - Math.random()).slice(0, 6));
+            
             const list = (c) => vids.value.filter(x => x.category === c);
             const paged = (c) => list(c).slice(pMap.value[c]*itemsPerPage.value, (pMap.value[c]+1)*itemsPerPage.value);
             const isEnd = (c) => (pMap.value[c]+1)*itemsPerPage.value >= list(c).length;
 
-            const goAdm = () => { if(prompt("Mật mã:") === 'cong1997') isAdm.value = true; };
-            const save = async () => {
-                const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${nId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
+            const saveVid = async () => {
+                const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
                 const d = await r.json();
                 if(d.items && d.items[0]) {
-                    db.ref('videos').push({ id: nId.value, title: d.items[0].snippet.title, category: nCat.value, views: 0, likes: 0 });
-                    nId.value = ''; alert("Xong!");
+                    db.ref('videos').push({ id: newId.value, title: d.items[0].snippet.title, category: newCat.value, views: 0, likes: 0 });
+                    newId.value = ''; alert("Thêm video thành công!");
                 }
             };
-            const del = (k) => { if(confirm("Xóa?")) db.ref('videos/'+k).remove(); };
+            const del = (k) => { if(confirm("Xóa bài này?")) db.ref('videos/'+k).remove(); };
 
-            return { vids, cur, cats, pMap, itemsPerPage, isAdm, nId, nCat, play, like, isLiked, suggest, list, paged, isEnd, goAdm, save, del };
+            return { vids, cur, cats, pMap, itemsPerPage, showLogin, passInput, isAdm, checkPass, newId, newCat, play, vote, isLiked, suggest, list, paged, isEnd, saveVid, del };
         }
     }).mount('#app');
 };
