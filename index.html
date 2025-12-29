@@ -84,4 +84,157 @@
         <div v-if="adm" style="margin:20px 0; padding:25px; border:2px dashed var(--primary); border-radius:20px; background:#fff5f6; display: flex; gap: 15px; align-items: center;">
             <input v-model="newI" placeholder="Nhập ID YouTube" style="padding:12px; flex: 1; border-radius:10px; border:1px solid #ddd;">
             <select v-model="newC" style="padding:12px; border-radius:10px;">
-                <option v-for="c in cats" :value="c">{{
+                <option v-for="c in cats" :value="c">{{c}}</option>
+            </select>
+            <button @click="add" style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer; font-weight: bold;">THÊM VIDEO</button>
+            <button @click="adm=false" style="color:gray; background:none; border:none; cursor:pointer;">Đóng</button>
+        </div>
+
+        <div class="player-grid" v-if="cur">
+            <div class="player-left">
+                <div class="video-wrapper">
+                    <iframe :key="cur.id" :src="'https://www.youtube.com/embed/' + cur.id + '?autoplay=1&rel=0&modestbranding=1'" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                </div>
+                <h1 class="main-title">{{ cur.title }}</h1>
+                <div class="stats-bar">
+                    <span>👁️ {{ cur.views || 0 }} lượt xem</span>
+                    <button class="btn-vote" :class="{active: isLiked}" @click="vote">❤️ {{ cur.likes || 0 }} Thích</button>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="side-head">CÓ THỂ BẠN THÍCH</div>
+                <div v-for="v in suggest" :key="v.key" class="side-item" @click="play(v)">
+                    <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                    <div class="side-title">{{ v.title }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div v-for="cat in cats" :key="cat" :class="'cat-' + cat.toLowerCase().replace(/ /g, '-')">
+            <div v-if="getVids(cat).length > 0">
+                <div class="section-header">
+                    <h3 class="section-title">{{ cat }}</h3>
+                    <div class="page-controls" v-if="getVids(cat).length > itemsPerPage">
+                        <button class="page-btn" @click="pageMap[cat]--" :disabled="pageMap[cat] === 0">❮</button>
+                        <button class="page-btn" @click="pageMap[cat]++" :disabled="isLast(cat)">❯</button>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div v-for="v in getPaged(cat)" :key="v.key" class="card" @click="play(v)">
+                        <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
+                        <h4>{{ v.title }}</h4>
+                        <div style="font-size:12px; color:#999; display: flex; justify-content: space-between;">
+                            <span>👁️ {{ v.views }}</span>
+                            <span>❤️ {{ v.likes }}</span>
+                        </div>
+                        <button v-if="adm" @click.stop="del(v.key)" style="color:red; border:none; background:none; cursor:pointer; font-size:11px; margin-top:10px; font-weight:bold;">[XÓA]</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-else style="text-align:center; padding:150px 20px;">
+        <h2 style="color:var(--primary); font-family: 'Montserrat';">ĐANG KẾT NỐI BẢN LÀNG...</h2>
+        <p style="color:#888;">Vui lòng đợi trong giây lát</p>
+    </div>
+
+    <footer>
+        <div class="logo">NGƯỜI Ở <span>BẢN</span></div>
+        <div class="footer-desc">GÌN GIỮ BẢN SẮC VIỆT &copy; 2025</div>
+    </footer>
+</div>
+
+<script>
+window.onload = function() {
+    const config = {
+        apiKey: "AIzaSyC96V7VVvxtEpn9b-CXgc_6PCJCijCEDSI",
+        authDomain: "nguoioban-77943.firebaseapp.com",
+        databaseURL: "https://nguoioban-77943-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        projectId: "nguoioban-77943",
+        appId: "1:96090638378:web:84c6d4c9ae26a87869db53"
+    };
+
+    firebase.initializeApp(config);
+    const db = firebase.database();
+    const { createApp, ref, onMounted, computed } = Vue;
+
+    createApp({
+        setup() {
+            const vids = ref([]);
+            const cur = ref(null);
+            const cats = ['Video ngắn', 'Cuộc sống thường ngày', 'Ẩm thực làng quê', 'Góc khám phá'];
+            const pageMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
+            const itemsPerPage = ref(5);
+            const adm = ref(false);
+            const newI = ref('');
+            const newC = ref('Video ngắn');
+            const ip = ref('');
+
+            onMounted(async () => {
+                const updateCols = () => {
+                    itemsPerPage.value = window.innerWidth > 1000 ? 5 : (window.innerWidth > 650 ? 3 : 2);
+                };
+                updateCols();
+                window.addEventListener('resize', updateCols);
+
+                try {
+                    const r = await fetch('https://api.ipify.org?format=json');
+                    const d = await r.json();
+                    ip.value = d.ip.replace(/\./g, '_');
+                } catch(e) { ip.value = 'guest'; }
+
+                db.ref('videos').on('value', s => {
+                    const val = s.val();
+                    if(val) {
+                        const arr = Object.keys(val).map(k => ({key:k, ...val[k]})).reverse();
+                        vids.value = arr;
+                        if(!cur.value) cur.value = arr[0];
+                        if(cur.value) {
+                            const found = arr.find(x => x.key === cur.value.key);
+                            if(found) cur.value = found;
+                        }
+                    }
+                });
+            });
+
+            const play = (v) => {
+                cur.value = v;
+                db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1);
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            };
+
+            const vote = () => {
+                if(!cur.value || isLiked.value) return;
+                db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1);
+                db.ref(`videos/${cur.value.key}/voters/${ip.value}`).set(true);
+            };
+
+            const isLiked = computed(() => cur.value && cur.value.voters && cur.value.voters[ip.value]);
+            const suggest = computed(() => vids.value.filter(x => x.id !== cur.value?.id).sort(() => 0.5 - Math.random()).slice(0, 6));
+            const getVids = (c) => vids.value.filter(x => x.category === c);
+            const getPaged = (c) => getVids(c).slice(pageMap.value[c]*itemsPerPage.value, (pageMap.value[c]+1)*itemsPerPage.value);
+            const isLast = (c) => (pageMap.value[c]+1)*itemsPerPage.value >= getVids(c).length;
+
+            const adminPop = () => { if(prompt("Nhập mã bảo mật:") === 'cong1997') adm.value = true; };
+            const add = async () => {
+                if(!newI.value) return;
+                try {
+                    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newI.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
+                    const d = await r.json();
+                    if(d.items && d.items[0]) {
+                        db.ref('videos').push({ id: newI.value, title: d.items[0].snippet.title, category: newC.value, views: 0, likes: 0 });
+                        newI.value = ''; alert("Thêm video thành công!");
+                    } else { alert("ID Video không tồn tại!"); }
+                } catch(e) { alert("Lỗi kết nối!"); }
+            };
+            const del = (k) => { if(confirm("Xác nhận xóa video này?")) db.ref('videos/'+k).remove(); };
+
+            return { vids, cur, cats, pageMap, itemsPerPage, adm, newI, newC, play, vote, isLiked, suggest, getVids, getPaged, isLast, adminPop, add, del };
+        }
+    }).mount('#app');
+};
+</script>
+</body>
+</html>
