@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Ở Bản - Kết nối yêu thương</title>
+    <title>Người Ở Bản - Giao Diện Màu Sắc</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -193,4 +193,60 @@ window.onload = function() {
             const isAdm = ref(false);
             const checkPass = () => {
                 if(passInput.value === 'cong1997') {
-                    isAdm.value = true; showLogin.value = false; passInput.value
+                    isAdm.value = true; showLogin.value = false; passInput.value = '';
+                } else { alert("Mật mã sai!"); }
+            };
+
+            const newId = ref('');
+            const newCat = ref('Video ngắn');
+            const ip = ref('');
+
+            onMounted(async () => {
+                const resiz = () => itemsPerPage.value = window.innerWidth > 1000 ? 5 : (window.innerWidth > 600 ? 3 : 2);
+                resiz(); window.addEventListener('resize', resiz);
+
+                try {
+                    const r = await fetch('https://api.ipify.org?format=json');
+                    const d = await r.json();
+                    ip.value = d.ip.replace(/\./g, '_');
+                } catch(e) { ip.value = 'guest'; }
+
+                db.ref('videos').on('value', s => {
+                    const val = s.val();
+                    if(val) {
+                        const arr = Object.keys(val).map(k => ({key:k, ...val[k]})).reverse();
+                        vids.value = arr;
+                        if(!cur.value) cur.value = arr[0];
+                        if(cur.value) {
+                            const found = arr.find(x => x.key === cur.value.key);
+                            if(found) cur.value = found;
+                        }
+                    }
+                });
+            });
+
+            const play = (v) => { cur.value = v; db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1); window.scrollTo({top:0, behavior:'smooth'}); };
+            const vote = () => { if(!cur.value || isLiked.value) return; db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${cur.value.key}/voters/${ip.value}`).set(true); };
+            const isLiked = computed(() => cur.value && cur.value.voters && cur.value.voters[ip.value]);
+            const suggest = computed(() => vids.value.filter(x => x.id !== cur.value?.id).sort(() => 0.5 - Math.random()).slice(0, 6));
+            const list = (c) => vids.value.filter(x => x.category === c);
+            const paged = (c) => list(c).slice(pMap.value[c]*itemsPerPage.value, (pMap.value[c]+1)*itemsPerPage.value);
+            const isEnd = (c) => (pMap.value[c]+1)*itemsPerPage.value >= list(c).length;
+
+            const saveVid = async () => {
+                const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
+                const d = await r.json();
+                if(d.items && d.items[0]) {
+                    db.ref('videos').push({ id: newId.value, title: d.items[0].snippet.title, category: newCat.value, views: 0, likes: 0 });
+                    newId.value = ''; alert("Thêm thành công!");
+                }
+            };
+            const del = (k) => { if(confirm("Xóa bài?")) db.ref('videos/'+k).remove(); };
+
+            return { vids, cur, cats, pMap, itemsPerPage, showLogin, passInput, isAdm, checkPass, newId, newCat, play, vote, isLiked, suggest, list, paged, isEnd, saveVid, del };
+        }
+    }).mount('#app');
+};
+</script>
+</body>
+</html>
