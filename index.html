@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Ở Bản - Bản Fix Lỗi Đăng Nhập</title>
+    <title>Người Ở Bản - Kết nối yêu thương</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -15,31 +15,52 @@
         [v-cloak] { display: none !important; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #1a1a1a; }
         
-        /* Giao diện chính */
         header { padding: 25px 0; text-align: center; border-bottom: 5px solid var(--primary); background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: 4px; text-transform: uppercase; cursor: pointer; }
         .logo span { color: var(--primary); }
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-        /* Đăng nhập Admin (Modal) */
+        /* Modal Admin */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .modal-box { background: #fff; padding: 30px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 20px; width: 350px; text-align: center; }
+        .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; }
         .modal-box button { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
-        /* Player & Sidebar */
+        /* Video Player Area */
         .layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; margin: 30px 0; }
-        .v-main { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; }
+        .v-main { width: 100%; position: relative; padding-bottom: 56.25%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .v-main iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         
-        .sidebar { background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; }
+        /* PHẦN THÔNG TIN VIDEO MỚI CẬP NHẬT */
+        .v-info-card { margin-top: 20px; padding: 10px 5px; }
+        .v-display-title { 
+            font-size: 26px; font-weight: 800; line-height: 1.3; margin: 0 0 15px 0;
+            background: linear-gradient(90deg, #1a1a1a, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .v-meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .playlist-tag { 
+            background: #f0f2f5; color: #555; padding: 6px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: 700; border-left: 4px solid var(--primary);
+        }
+        .stat-badge { font-size: 14px; font-weight: 600; color: #666; display: flex; align-items: center; gap: 5px; }
+        .stat-badge i { color: var(--primary); }
+        .like-btn { 
+            cursor: pointer; background: #fff; border: 2px solid #eee; padding: 7px 20px; 
+            border-radius: 30px; font-weight: 800; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .like-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3); }
+
+        /* Sidebar */
+        .sidebar { background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; height: fit-content; }
         .side-head { font-weight: 900; color: var(--primary); font-size: 13px; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .side-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; padding: 5px; border-radius: 10px; }
         .side-item:hover { background: #fff; transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .side-item img { width: 110px; height: 62px; border-radius: 8px; object-fit: cover; }
         .side-txt { font-size: 13px; font-weight: 700; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Chuyên mục & Phân trang */
+        /* Categories */
         .cat-video-ngắn { --c: #ff4757; --b: #fff5f6; }
         .cat-cuộc-sống-thường-ngày { --c: #2ed573; --b: #f0fff4; }
         .cat-ẩm-thực-làng-quê { --c: #ffa502; --b: #fffaf0; }
@@ -96,12 +117,19 @@
                 <div class="v-main">
                     <iframe :key="cur.id" :src="'https://www.youtube.com/embed/' + cur.id + '?autoplay=1'" allowfullscreen allow="autoplay"></iframe>
                 </div>
-                <h2 style="font-size:24px; margin:20px 0 10px;">{{ cur.title }}</h2>
-                <div style="color:#666; font-size:14px; margin-bottom:30px;">
-                    👁️ {{ cur.views || 0 }} lượt xem • 
-                    <button @click="vote" style="cursor:pointer; background:none; border:1px solid #ddd; padding:5px 15px; border-radius:20px;" :style="isLiked ? 'background:red; color:white; border-color:red' : ''">❤️ {{ cur.likes || 0 }} Thích</button>
+                
+                <div class="v-info-card">
+                    <h2 class="v-display-title">{{ cur.title }}</h2>
+                    <div class="v-meta-row">
+                        <div class="playlist-tag">📂 Danh sách: {{ cur.category }}</div>
+                        <div class="stat-badge">👁️ <b>{{ cur.views || 0 }}</b> lượt xem</div>
+                        <button class="like-btn" :class="{active: isLiked}" @click="vote">
+                            <span>❤️</span> <b>{{ cur.likes || 0 }}</b> Thích
+                        </button>
+                    </div>
                 </div>
             </div>
+
             <div class="sidebar">
                 <div class="side-head">CÓ THỂ BẠN THÍCH</div>
                 <div v-for="v in suggest" :key="v.key" class="side-item" @click="play(v)">
@@ -125,7 +153,7 @@
                         <img :src="'https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg'">
                         <h4>{{ v.title }}</h4>
                         <div style="font-size:12px; color:#999;">👁️ {{ v.views }} • ❤️ {{ v.likes }}</div>
-                        <button v-if="isAdm" @click.stop="del(v.key)" style="color:red; background:none; border:none; cursor:pointer; font-size:10px; margin-top:5px;">[XÓA BÀI]</button>
+                        <button v-if="isAdm" @click.stop="del(v.key)" style="color:red; background:none; border:none; cursor:pointer; font-size:10px; margin-top:5px;">[XÓA]</button>
                     </div>
                 </div>
             </div>
@@ -160,67 +188,9 @@ window.onload = function() {
             const pMap = ref({ 'Video ngắn': 0, 'Cuộc sống thường ngày': 0, 'Ẩm thực làng quê': 0, 'Góc khám phá': 0 });
             const itemsPerPage = ref(5);
             
-            // Logic Admin mới
             const showLogin = ref(false);
             const passInput = ref('');
             const isAdm = ref(false);
             const checkPass = () => {
                 if(passInput.value === 'cong1997') {
-                    isAdm.value = true; showLogin.value = false; passInput.value = '';
-                } else { alert("Mật mã sai!"); }
-            };
-
-            const newId = ref('');
-            const newCat = ref('Video ngắn');
-            const ip = ref('');
-
-            onMounted(async () => {
-                const resiz = () => itemsPerPage.value = window.innerWidth > 1000 ? 5 : (window.innerWidth > 600 ? 3 : 2);
-                resiz(); window.addEventListener('resize', resiz);
-
-                try {
-                    const r = await fetch('https://api.ipify.org?format=json');
-                    const d = await r.json();
-                    ip.value = d.ip.replace(/\./g, '_');
-                } catch(e) { ip.value = 'guest'; }
-
-                db.ref('videos').on('value', s => {
-                    const val = s.val();
-                    if(val) {
-                        const arr = Object.keys(val).map(k => ({key:k, ...val[k]})).reverse();
-                        vids.value = arr;
-                        if(!cur.value) cur.value = arr[0];
-                        if(cur.value) {
-                            const found = arr.find(x => x.key === cur.value.key);
-                            if(found) cur.value = found;
-                        }
-                    }
-                });
-            });
-
-            const play = (v) => { cur.value = v; db.ref(`videos/${v.key}/views`).transaction(v => (v || 0) + 1); window.scrollTo({top:0, behavior:'smooth'}); };
-            const vote = () => { if(!cur.value || isLiked.value) return; db.ref(`videos/${cur.value.key}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${cur.value.key}/voters/${ip.value}`).set(true); };
-            const isLiked = computed(() => cur.value && cur.value.voters && cur.value.voters[ip.value]);
-            const suggest = computed(() => vids.value.filter(x => x.id !== cur.value?.id).sort(() => 0.5 - Math.random()).slice(0, 6));
-            
-            const list = (c) => vids.value.filter(x => x.category === c);
-            const paged = (c) => list(c).slice(pMap.value[c]*itemsPerPage.value, (pMap.value[c]+1)*itemsPerPage.value);
-            const isEnd = (c) => (pMap.value[c]+1)*itemsPerPage.value >= list(c).length;
-
-            const saveVid = async () => {
-                const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${newId.value}&key=AIzaSyBmx01zCKU5Z6XJcVTEurtcQrVq42iPSTM`);
-                const d = await r.json();
-                if(d.items && d.items[0]) {
-                    db.ref('videos').push({ id: newId.value, title: d.items[0].snippet.title, category: newCat.value, views: 0, likes: 0 });
-                    newId.value = ''; alert("Thêm video thành công!");
-                }
-            };
-            const del = (k) => { if(confirm("Xóa bài này?")) db.ref('videos/'+k).remove(); };
-
-            return { vids, cur, cats, pMap, itemsPerPage, showLogin, passInput, isAdm, checkPass, newId, newCat, play, vote, isLiked, suggest, list, paged, isEnd, saveVid, del };
-        }
-    }).mount('#app');
-};
-</script>
-</body>
-</html>
+                    isAdm.value = true; showLogin.value = false; passInput.value
